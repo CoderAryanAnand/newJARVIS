@@ -1,0 +1,116 @@
+{"intents": [
+  {"tag": "greeting",
+    "patterns": ["Hi", "How are you", "Is anyone there?", "Hello", "Good day", "Whats up", "Hey", "greetings", "Sup"],
+    "responses": ["Hello!", "Good to see you again!", "Hi there, how can I help?"],
+    "type": "n"
+  },
+  {"tag": "goodbye",
+    "patterns": ["cya", "See you later", "Goodbye", "I am Leaving", "Have a Good day", "bye", "ciao", "see ya"],
+    "responses": ["Sad to see you go :(", "Talk to you later", "Goodbye!"],
+    "type": "n"
+  },
+  {"tag": "name",
+    "patterns": ["what is your name", "what should i call you", "whats your name?", "who are you", "you are who", "tell me who you are"],
+    "responses": ["You can call me Jarvis", "I am Jarvis", "Jarvis, at your service"],
+    "type": "n"
+  },
+  {"tag": "weather",
+    "patterns": ["what is the weather", "how is the weather like", "whats the weather?", "whats the weather like", "weather", "tell me about the weather"],
+    "responses": ["The weather is {}", "It is {}", "{}"],
+    "type": "y"
+  },
+  {"tag": "temperature",
+    "patterns": ["what is the temperature", "what is the temperature like", "whats the temperature?", "whats the temperature like", "temperature", "tell me about the temperature"],
+    "responses": ["The temperature is {}", "It is {}", "{}"],
+    "type": "y"
+  },
+  {"tag": "screenshot",
+    "patterns": ["Take a screenshot", "screenshot", "take a picture of my screen", "take a pic of my screen"],
+    "responses": ["Took a screenshot. It is saved in the folder \"photos\".\nDo you want me to open it?", "Your screenshot is saved in the folder \"photos\".\nDo you want me to open it?"],
+    "type": "y"
+  },
+  {"tag": "song",
+    "patterns": ["song", "play me a song", "play a song", "make some music", "play some music"],
+    "responses": ["Alright, I hope you like it!", "Playing the song now."],
+    "type": "y"
+  },
+  {"tag": "wikipedia",
+    "patterns": ["wikipedia", "search something on wikipedia", "do a wikipedia search", "wiki", "search something on wiki", "do a wiki search"],
+    "responses": ["Here is what I found on Wikipedia: {0[0]}\nSee full article here: {0[1]}\nDo you want me to do a google search on this?", "Wikipedia says: {0[0]}\nSee full article here: {0[1]}\nDo you want me to do an internet search on this?"],
+    "type": "y"
+  },
+  {"tag": "internet_search",
+    "patterns": ["search something on the internet", "search something on the web", "search something on google", "do a web search", "web", "search something on the web", "do an internet search", "google something", "google something for me"],
+    "responses": ["Here is what I found on the internet:\n{0[0]}\nSee full search here: {0[1]}\nDo you want me to open the full search?", "Google says:\n{0[0]}\nSee full search here: {0[1]}\nDo you want me to open it?"],
+    "type": "y"
+  },
+  {"tag": "review",
+    "patterns": ["get a review on something", "search something on imdb", "review something on imdb", "do an imdb search on something", "imdb", "review", "do an imdb search", "review something", "review something for me"],
+    "responses": ["Here is the rating I found on IMDb: {0[0]}\nSee full review here: {0[1]}\nDo you want me to do a google search on this?", "IMDb says the rating is {0[0]}\nSee full review here: {0[1]}\nDo you want me to do an internet search on this?"],
+    "type": "y"
+  },
+  {"tag": "news",
+    "patterns": ["check the latest news", "search something on the news", "look at the news", "do a news search", "news", "latest news", "whats happening", "what is happening right now"],
+    "responses": ["Here is the summarized version of the article:\n{0[0]}\nSee full article here: {0[1]}\nDo you want me to open it?", "Summarized article:\n{0[0]}\nSee full article here: {0[1]}\nDo you want me to open the article for you?"],
+    "type": "y"
+  },
+  {"tag": "cpu",
+    "patterns": ["How is my computer doing", "what is the battery power", "is my computer plugged in", "can you tell me the cpu usage", "how much charge do i have", "cpu", "computer", "battery"],
+    "responses": ["CPU Usage: {0[0]} | Battery Power: {0[1]} | {0[2]} Plugged In", "The CPU Usage is at {0[0]}, you have {0[1]} battery and your computer {0[2]} plugged in"],
+    "type": "y"
+  },
+  {"tag": "joke",
+    "patterns": ["can you tell me a joke?", "make me laugh", "joke please", "can you make me laugh", "Can you tell me a joke", "say some thing funny", "tell me something funny",  "tell me funny joke", "joke"],
+    "responses": ["This one is going to make you laugh - {}\nDo you want me tell you another one?", "Here is a really funny one off the top of my head - {}\nDo you want me tell you another one?", "Listen to this one - {}\nDo you want me tell you another one?"],
+    "type": "y"
+  },
+  {"tag": "relaxing_music",
+    "patterns": ["can you play some relaxing music?", "make me study", "relaxing music please", "can you play some beats to study to", "Can you make me study", "play something relaxing", "music to study to",  "relaxing music"],
+    "responses": ["Have fun!", "Here is a really funny one off the top of my head - {}\nDo you want me tell you another one?", "Listen to this one - {}\nDo you want me tell you another one?"],
+    "type": "y"
+  },
+  {"tag": "time",
+    "patterns": ["what is the time", "whats the time?", "can you tell me the time?", "what time is it?", "what time is it now"],
+    "responses": ["It is {}\nDo you want to know the date?", "Now it is {}Do you want to know the date?", "{}Do you want to know the date?"],
+    "type": "y"
+  },
+  {"tag": "date",
+    "patterns": ["what is the date", "whats the date?", "can you tell me the date?", "what day is it?", "what day is today"],
+    "responses": ["It is {}\nDo you want to know the time?", "Today is {}\nDo you want to know the time?", "{}\nDo you want to know the time?"],
+    "type": "y"
+  },
+  {"tag": "no_answer",
+  "patterns": [],
+  "responses": ["Sorry, can't understand you", "Please give me more info", "Not sure I understand"],
+  "type": "n"
+  },
+  {"tag": "options",
+  "patterns": ["How you could help me?", "What you can do?", "What help you provide?", "How you can be helpful?", "What support is offered"],
+  "responses": ["Ease your lifestyle by playing music, searching wikipedia, etc", "Solve mathematical expression, play some music etc", "Whatever you say"],
+  "type": "n"
+  },
+  {"tag": "good_joke",
+  "patterns": ["haha", "hahahaa","that was funny", "very funny", "good one"],
+  "responses": ["Thanks. I have been told before that I am quite the comedian.", "I am glad you enjoyed it", "I laughed so hard the first time I heard that one"],
+  "type": "n"
+  },
+  {"tag": "bad_joke",
+  "patterns": ["bad joke", "trash joke", "terrible", "not funny"],
+  "responses": ["Do not worry I did not expect you to understand that one. It probably went over your head with that small brain of yours", "I did not expect you to understand my genius comedy. You need a minimum IQ of 300 to even understand the depth of my humor"],
+  "type": "n"
+  },
+  {"tag": "note",
+  "patterns": ["create a new note", "create a note", "note", "write something down for me", "please write something down", "make a note", "make a new note"],
+  "responses": ["Created a new note at this location: {}\nDo you want me to open it?", "This is the location of the note: {}\nDo you want me to open it?"],
+  "type": "y"
+  },
+  {"tag": "continue_dialog",
+  "patterns": ["yup", "yes please", "yes", "yea", "yeah", "very well", "certainly", "sure", "affirmative", "aye", "absolutely", "all right", "alright", "by all means", "yep", "ok", "okay", "okey-dokey", "yah", "aye aye", "fine"],
+  "responses": ["All right."],
+  "type": "y"},
+  {"tag": "no",
+  "patterns": ["nope", "no thanks", "no", "no thx", "no but thank you", "negative", "nah", "no way", "naw", "nay", "not really", "absolutely not", "never", "by no means", "not", "not really", "nae", "most certainly not", "no indeed"],
+  "responses": ["Oh ok...", "Alright.", "Anything else I can help with?"],
+  "type": "n"}
+]
+}
