@@ -136,3 +136,14 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# Stuff from JARVIS project
+chatbot_model.model/
+chatbotmodel.h5
+classes.pkl
+labels.pkl
+types.pkl
+words.pkl
+
+notes/
+screenshots/

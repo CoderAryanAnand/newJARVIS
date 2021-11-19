@@ -224,7 +224,7 @@ def get_info(tag, request, previous=False):
 
     elif tag == "screenshot":
         time_at_the_moment = dt.datetime.now()
-        file_name = ".\\photos\\" + str(time_at_the_moment).replace(":", "-") + "-screenshot.png"
+        file_name = ".\\screenshots\\" + str(time_at_the_moment).replace(":", "-") + "-screenshot.png"
         img = pag.screenshot()
         img.save(file_name)
 
