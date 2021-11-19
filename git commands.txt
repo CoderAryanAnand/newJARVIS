@@ -1,0 +1,5 @@
+git commit -m "message"
+git push -u origin main
+git add .
+git checkout <branch_name>
+git checkout <branch_name> -b <new_branch_name>
