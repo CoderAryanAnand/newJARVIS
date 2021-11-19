@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7f71a3d9-0874-499a-94a3-d64e379d0f74" name="Changes" comment="" />
+    <list default="true" id="7f71a3d9-0874-499a-94a3-d64e379d0f74" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/git commands.txt" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
