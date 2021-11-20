@@ -54,6 +54,16 @@
     "responses": ["Here is the summarized version of the article:\n{0[0]}\nSee full article here: {0[1]}\nDo you want me to open it?", "Summarized article:\n{0[0]}\nSee full article here: {0[1]}\nDo you want me to open the article for you?"],
     "type": "y"
   },
+  {"tag": "read_email",
+    "patterns": ["check the latest email", "show me the content of my latest email i received", "look at the latest email i got", "latest email", "read my latest email", "read email"],
+    "responses": ["Here it is:\n{0[0]}\nIt is from {0[1]}\nDo you want me to reply to the sender?", "Email:\n{0[0]}\nFrom: {0[1]}\nDo you want me to reply?"],
+    "type": "y"
+  },
+  {"tag": "read_email",
+    "patterns": ["send an email", "write an email", "email somebody", "email my friend", "write email", "send email"],
+    "responses": ["Sent!", "Alright!"],
+    "type": "y"
+  },
   {"tag": "cpu",
     "patterns": ["How is my computer doing", "what is the battery power", "is my computer plugged in", "can you tell me the cpu usage", "how much charge do i have", "cpu", "computer", "battery"],
     "responses": ["CPU Usage: {0[0]} | Battery Power: {0[1]} | {0[2]} Plugged In", "The CPU Usage is at {0[0]}, you have {0[1]} battery and your computer {0[2]} plugged in"],

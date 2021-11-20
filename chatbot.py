@@ -3,6 +3,11 @@ import random
 import json
 import pickle
 import webbrowser
+import imaplib
+import smtplib
+import email
+from email.parser import HeaderParser
+from email.utils import parseaddr
 
 import numpy as np
 import ssl
@@ -53,6 +58,9 @@ RELAXING_MUSIC = ["https://www.youtube.com/watch?v=5qap5aO4i9A",
                   "https://www.youtube.com/watch?v=cGYyOY4XaFs",
                   "https://www.youtube.com/watch?v=M2NcuP5mRqs",
                   ]
+APP_PASSWORD = "yrzvzurdmjrkiymn"
+EMAIL_USER = "aryananand.chess@gmail.com"
+IMAP_URL = "imap.gmail.com"
 
 print(classes)
 print(types)
@@ -69,12 +77,12 @@ print(words)
 - News (BBC)            x
 - Notes                 x
 - Relaxing/Study Music  x
+- Email                 
 
 
 -------
 Maybe
 -------
-+ Email
 + Calculator
 + Open Website/App  # need intents
 
@@ -133,6 +141,13 @@ def get_date():
         return f"{weekday}, the {day}rd of {month}, {year}."
     else:
         return f"{weekday}, the {day}th of {month}, {year}."
+
+
+def get_body(msg):
+    if msg.is_multipart():
+        return get_body(msg.get_payload(0))
+    else:
+        return msg.get_payload(None, True)
 
 
 def internet_search(request):
@@ -430,6 +445,47 @@ def get_info(tag, request, previous=False):
 
         return os.path.abspath(file_name)
 
+    elif tag == "read_email":
+        con = imaplib.IMAP4_SSL(IMAP_URL)
+        con.login(EMAIL_USER, APP_PASSWORD)
+
+        con.select('Primary')
+
+        num = con.select("Primary")
+        result, data = con.fetch(num[1][0], '(RFC822)')
+        raw = email.message_from_bytes(data[0][1])
+
+        sender = parseaddr(HeaderParser().parsestr(data[0][1].decode("utf-8"))["From"])[1]
+
+        ARGUMENTS[0] = "read_email"
+        ARGUMENTS[1] = sender[1]
+
+        return get_body(raw).decode("utf-8"), sender[0]
+
+    elif tag == "write_email":
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login(EMAIL_USER, APP_PASSWORD)
+
+        receiver = input("Receiver: ")
+        subject = input("Subject: ")
+        body = input("Content: ")
+
+        msg = f"Subject: {subject}\n\n{body}"
+
+        server.sendmail(
+            'JARVIS',
+            receiver,
+            msg
+        )
+
+        ARGUMENTS[0] = ""
+        ARGUMENTS[1] = ""
+
+        return
+
     elif previous:
         if ARGUMENTS[0] != "" and ARGUMENTS[1] != "":
             if ARGUMENTS[0] in ["note", "screenshot"]:
@@ -451,6 +507,28 @@ def get_info(tag, request, previous=False):
                 print(f"{ARGUMENTS[1]}\nDo you want to hear another one?")
                 ARGUMENTS[0] = "joke"
                 ARGUMENTS[1] = joke.get_joke()
+
+            elif ARGUMENTS[0] == "read_email":
+                server = smtplib.SMTP('smtp.gmail.com', 587)
+                server.ehlo()
+                server.starttls()
+                server.ehlo()
+                server.login(EMAIL_USER, APP_PASSWORD)
+
+                receiver = ARGUMENTS[1]
+                subject = input("Subject: ")
+                body = input("Content: ")
+
+                msg = f"Subject: {subject}\n\n{body}"
+
+                server.sendmail(
+                    'JARVIS',
+                    receiver,
+                    msg
+                )
+
+                ARGUMENTS[0] = ""
+                ARGUMENTS[1] = ""
 
 
 def clean_up_sentence(sentence):
@@ -575,7 +653,7 @@ speech_words2.concordance("great")
 print(image_to_ascii_art("index.jpg"))
 
 while True:
-    message = input(">")
+    message = input("> ")
 
     ints = predict_class(message)
     res = get_response(ints, intents)
