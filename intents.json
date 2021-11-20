@@ -66,7 +66,7 @@
   },
   {"tag": "relaxing_music",
     "patterns": ["can you play some relaxing music?", "make me study", "relaxing music please", "can you play some beats to study to", "Can you make me study", "play something relaxing", "music to study to",  "relaxing music"],
-    "responses": ["Have fun!", "Here is a really funny one off the top of my head - {}\nDo you want me tell you another one?", "Listen to this one - {}\nDo you want me tell you another one?"],
+    "responses": ["Have fun!", "Enjoy!", "OK"],
     "type": "y"
   },
   {"tag": "time",

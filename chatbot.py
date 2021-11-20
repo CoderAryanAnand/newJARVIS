@@ -255,6 +255,14 @@ def get_info(tag, request, previous=False):
 
         return
 
+    elif tag == "relaxing_music":
+        kit.playonyt(random.choice(RELAXING_MUSIC))
+
+        ARGUMENTS[0] = ""
+        ARGUMENTS[1] = ""
+
+        return
+
     elif tag == "wikipedia":
         try:
             # query = input("What do you what to search on wikipedia?\n")
