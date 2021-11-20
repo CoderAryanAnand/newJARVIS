@@ -66,12 +66,13 @@ print(words)
 - Cpu                   x
 - Jokes                 x
 - Time                  x
+- News (BBC)            x
+- Notes                 x
 
 
 -------
 Maybe
 -------
-+ Notes
 + Email
 + Calculator
 + Open Website/App  # need intents
@@ -173,7 +174,7 @@ def internet_search(request):
     return return_links, search_link
 
 
-def image_to_ascii_art(img_path, output_file, output_dec=False):
+def image_to_ascii_art(img_path, output_file="", output_dec=False):
     img = Image.open(img_path).convert("L")
 
     width, height = img.size
@@ -556,6 +557,8 @@ speech_words2.concordance("great")
 #
 #   for synonym in unique:
 #     print('\t', synonym)
+
+print(image_to_ascii_art("index.jpg"))
 
 while True:
     message = input()
