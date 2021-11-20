@@ -530,6 +530,7 @@ POS = [nltk.pos_tag(tokenized_sent) for tokenized_sent in filtered]
 
 speech_words2 = Text(word_tokenize(speech))
 speech_words2.concordance("great")
+
 """
 #
 # def get_synonyms(word, pos):
