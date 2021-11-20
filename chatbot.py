@@ -38,10 +38,10 @@ from tensorflow.keras.models import load_model
 lemmatizer = WordNetLemmatizer()
 intents = json.loads(open("intents.json").read())
 
-words = pickle.load(open("words.pkl", "rb"))
-classes = pickle.load(open("classes.pkl", "rb"))
-types = pickle.load(open("types.pkl", "rb"))
-model = load_model("chatbotmodel.h5")
+words = pickle.load(open("models/words.pkl", "rb"))
+classes = pickle.load(open("models/classes.pkl", "rb"))
+types = pickle.load(open("models/types.pkl", "rb"))
+model = load_model("models/chatbotmodel.h5")
 
 ssl._create_default_https_context = ssl._create_unverified_context  # potential security risk, but needed here
 
@@ -68,6 +68,7 @@ print(words)
 - Time                  x
 - News (BBC)            x
 - Notes                 x
+- Relaxing/Study Music  x
 
 
 -------
@@ -180,7 +181,7 @@ def image_to_ascii_art(img_path, output_file="", output_dec=False):
     width, height = img.size
     aspect_ratio = height / width
     new_width = 80
-    new_height = aspect_ratio * new_width * 0.55
+    new_height = aspect_ratio * new_width * 0.4
     img = img.resize((new_width, int(new_height)))
 
     pixels = img.getdata()
@@ -484,7 +485,7 @@ def predict_class(sentence):
     ]
 
 
-def get_response(intents_list, intents_json, question):
+def get_response(intents_list, intents_json):
     try:
         tag = intents_list[0]["intent"]
         type_of_intent = intents_list[0]["type_of_intent"]
@@ -504,7 +505,11 @@ def get_response(intents_list, intents_json, question):
                     result = ""
                 break
     except IndexError:
-        result = "I don't understand!"
+        result = ""
+        print("I don't understand!")
+        print("Do you want me search this on the internet?")
+        ARGUMENTS[0] = "internet_search"
+        ARGUMENTS[1] = message
     return result
 
 
@@ -512,8 +517,8 @@ print("Started...")
 """
 speech = "Chess.com acquired the rights and is an official broadcast partner. On our LIVE page, you'll be able to " \
          "follow the live moves with computer analysis, live chat, and video commentary by grandmasters and special " \
-         "guests. GM Fabiano Caruana is just one of the world-class commentators who will be joining the team for this " \
-         "event."
+         "guests. GM Fabiano Caruana is just one of the world-class commentators who will be joining the team for 
+         this event."
 
 sentences = sent_tokenize(speech)
 
@@ -570,8 +575,8 @@ speech_words2.concordance("great")
 print(image_to_ascii_art("index.jpg"))
 
 while True:
-    message = input()
+    message = input(">")
 
     ints = predict_class(message)
-    res = get_response(ints, intents, message)
+    res = get_response(ints, intents)
     print(res)
