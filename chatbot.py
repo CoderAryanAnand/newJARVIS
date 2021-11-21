@@ -1,4 +1,5 @@
 import os.path
+import logging
 import random
 import json
 import pickle
@@ -40,6 +41,7 @@ from PIL import Image
 from bs4 import BeautifulSoup
 
 from tensorflow.keras.models import load_model
+from shlex import quote as shlex_quote
 
 lemmatizer = WordNetLemmatizer()
 intents = json.loads(open("intents.json").read())
@@ -66,9 +68,11 @@ APP_PASSWORD = "yrzvzurdmjrkiymn"
 EMAIL_USER = "aryananand.chess@gmail.com"
 IMAP_URL = "imap.gmail.com"
 
-print(classes)
-print(types)
-print(words)
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+
+logging.info(classes)
+logging.info(types)
+logging.info(words)
 
 # TODO
 """
@@ -179,10 +183,10 @@ def internet_search(request):
         i
         for i in pos
         if i[0] != "search"
-        and all(word_here.lower() != i[0] for word_here in synonyms_for_internet)
-        and i[1] != "MD"
-        and i[0] != "please"
-        and i[0] != "get"
+           and all(word_here.lower() != i[0] for word_here in synonyms_for_internet)
+           and i[1] != "MD"
+           and i[0] != "please"
+           and i[0] != "get"
     ]
 
     query = "".join(i[0] + " " for i in new_pos)
@@ -197,12 +201,12 @@ def internet_search(request):
     return return_links, search_link
 
 
-def image_to_ascii_art(img_path, height_factor=0.4, output_file="", output_dec=False):
+def image_to_ascii_art(img_path, height_factor=0.4, new_width=80, output_file="", output_dec=False):
     img = Image.open(img_path).convert("L")
 
     width, height = img.size
     aspect_ratio = height / width
-    new_width = 80
+    new_width = new_width
     new_height = aspect_ratio * new_width * height_factor
     img = img.resize((new_width, int(new_height)))
 
@@ -214,7 +218,7 @@ def image_to_ascii_art(img_path, height_factor=0.4, output_file="", output_dec=F
 
     new_pixels_count = len(new_pixels)
     ascii_image = [
-        new_pixels[index : index + new_width]
+        new_pixels[index: index + new_width]
         for index in range(0, new_pixels_count, new_width)
     ]
     ascii_image = "\n".join(ascii_image)
@@ -249,9 +253,9 @@ def get_info(tag, request, previous=False):
     elif tag == "screenshot":
         time_at_the_moment = dt.datetime.now()
         file_name = (
-            ".\\screenshots\\"
-            + str(time_at_the_moment).replace(":", "-")
-            + "-screenshot.png"
+                ".\\screenshots\\"
+                + str(time_at_the_moment).replace(":", "-")
+                + "-screenshot.png"
         )
         img = pag.screenshot()
         img.save(file_name)
@@ -273,10 +277,10 @@ def get_info(tag, request, previous=False):
             i
             for i in pos
             if i[0] != "music"
-            and i[0] != "play"
-            and i[0] != "song"
-            and i[1] != "MD"
-            and i[0] != "please"
+               and i[0] != "play"
+               and i[0] != "song"
+               and i[1] != "MD"
+               and i[0] != "please"
         ]
 
         song_name = "".join(i[0] for i in new_pos)
@@ -312,11 +316,11 @@ def get_info(tag, request, previous=False):
                 i
                 for i in pos
                 if i[0] != "wiki"
-                and i[0] != "search"
-                and i[0] != "wikipedia"
-                and i[1] != "MD"
-                and i[0] != "please"
-                and i[0] != "get"
+                   and i[0] != "search"
+                   and i[0] != "wikipedia"
+                   and i[1] != "MD"
+                   and i[0] != "please"
+                   and i[0] != "get"
             ]
 
             query = "".join(i[0] for i in new_pos)
@@ -345,11 +349,11 @@ def get_info(tag, request, previous=False):
                 i
                 for i in pos
                 if i[0] != "wiki"
-                and i[0] != "search"
-                and i[0] != "wikipedia"
-                and i[1] != "MD"
-                and i[0] != "please"
-                and i[0] != "get"
+                   and i[0] != "search"
+                   and i[0] != "wikipedia"
+                   and i[1] != "MD"
+                   and i[0] != "please"
+                   and i[0] != "get"
             ]
 
             query = "".join(i[0] + " " for i in new_pos)
@@ -398,13 +402,13 @@ def get_info(tag, request, previous=False):
             i
             for i in pos
             if i[0] != "search"
-            and all(
+               and all(
                 word_here.lower() != i[0]
                 for word_here in synonyms_for_internet_and_review
             )
-            and i[1] != "MD"
-            and i[0] != "please"
-            and i[0] != "get"
+               and i[1] != "MD"
+               and i[0] != "please"
+               and i[0] != "get"
         ]
 
         query = "".join(i[0] + " " for i in new_pos)
@@ -681,7 +685,8 @@ speech_words2.concordance("great")
 #   for synonym in unique:
 #     print('\t', synonym)
 
-print(image_to_ascii_art("index.jpg"), 0.4)
+print("\n" * 150, image_to_ascii_art("index.jpg", 0.37, 80))
+print("\n", image_to_ascii_art("index.png", 0.37, 40))
 
 while True:
     message = input("> ")

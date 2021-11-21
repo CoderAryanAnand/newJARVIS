@@ -90,7 +90,7 @@
     "type": "y"
   },
   {"tag": "no_answer",
-  "patterns": [],
+  "patterns": ["", " "],
   "responses": ["Sorry, can't understand you", "Please give me more info", "Not sure I understand"],
   "type": "n"
   },
@@ -116,7 +116,7 @@
   },
   {"tag": "continue_dialog",
   "patterns": ["yup", "yes please", "yes", "yea", "yeah", "very well", "certainly", "sure", "affirmative", "aye", "absolutely", "all right", "alright", "by all means", "yep", "ok", "okay", "okey-dokey", "yah", "aye aye", "fine"],
-  "responses": ["All right."],
+  "responses": ["Alright."],
   "type": "y"},
   {"tag": "no",
   "patterns": ["nope", "no thanks", "no", "no thx", "no but thank you", "negative", "nah", "no way", "naw", "nay", "not really", "absolutely not", "never", "by no means", "not", "not really", "nae", "most certainly not", "no indeed"],
