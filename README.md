@@ -1,10 +1,12 @@
 # JARVIS
 
 A new and improved version of the JARVIS I created in 2020
+This version works with Tensorflow and NLP. The answers are hardcoded, and will be picked randomly. The questions 
+however, will be used to train a model. Check ``training.py`` to see how it trains.
 
 ## Usage
 
-If models folder is empty, then run ```training.py``` first, and then run ```chatbot.py```.
+If models folder is empty, then run ``training.py`` first, and then run ``chatbot.py``.
 
 ## Example
 
