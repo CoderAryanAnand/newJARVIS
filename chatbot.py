@@ -11,7 +11,7 @@ from email.utils import parseaddr
 
 import numpy as np
 import ssl
-import curses
+# import curses
 
 import requests
 import psutil
@@ -77,7 +77,7 @@ print(words)
 - News (BBC)            x
 - Notes                 x
 - Relaxing/Study Music  x
-- Email                 
+- Email                 x
 
 
 -------

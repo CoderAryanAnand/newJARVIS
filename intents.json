@@ -56,10 +56,10 @@
   },
   {"tag": "read_email",
     "patterns": ["check the latest email", "show me the content of my latest email i received", "look at the latest email i got", "latest email", "read my latest email", "read email"],
-    "responses": ["Here it is:\n{0[0]}\nIt is from {0[1]}\nDo you want me to reply to the sender?", "Email:\n{0[0]}\nFrom: {0[1]}\nDo you want me to reply?"],
+    "responses": ["Here it is:\n{0[0]}\n\nIt is from {0[1]}.\nDo you want me to reply to the sender?", "Email:\n{0[0]}\n\nFrom: {0[1]}.\nDo you want me to reply?"],
     "type": "y"
   },
-  {"tag": "read_email",
+  {"tag": "write_email",
     "patterns": ["send an email", "write an email", "email somebody", "email my friend", "write email", "send email"],
     "responses": ["Sent!", "Alright!"],
     "type": "y"
