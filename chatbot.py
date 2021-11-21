@@ -190,13 +190,13 @@ def internet_search(request):
     return return_links, search_link
 
 
-def image_to_ascii_art(img_path, output_file="", output_dec=False):
+def image_to_ascii_art(img_path, height_factor=0.4, output_file="", output_dec=False):
     img = Image.open(img_path).convert("L")
 
     width, height = img.size
     aspect_ratio = height / width
     new_width = 80
-    new_height = aspect_ratio * new_width * 0.4
+    new_height = aspect_ratio * new_width * height_factor
     img = img.resize((new_width, int(new_height)))
 
     pixels = img.getdata()
@@ -650,7 +650,7 @@ speech_words2.concordance("great")
 #   for synonym in unique:
 #     print('\t', synonym)
 
-print(image_to_ascii_art("index.jpg"))
+print(image_to_ascii_art("index.jpg"), 0.4)
 
 while True:
     message = input("> ")
