@@ -11,6 +11,7 @@ from email.utils import parseaddr
 
 import numpy as np
 import ssl
+
 # import curses
 
 import requests
@@ -48,16 +49,19 @@ classes = pickle.load(open("models/classes.pkl", "rb"))
 types = pickle.load(open("models/types.pkl", "rb"))
 model = load_model("models/chatbotmodel.h5")
 
-ssl._create_default_https_context = ssl._create_unverified_context  # potential security risk, but needed here
+ssl._create_default_https_context = (
+    ssl._create_unverified_context
+)  # potential security risk, but needed here
 
 API_KEY = "d4a8a95799bc4f3d9a34ac59cebaa456"
 DEFAULT_NEWS_SOURCE = "bbc-news"
 NEWS_API = NewsApiClient(API_KEY)
 ARGUMENTS = ["", ""]
-RELAXING_MUSIC = ["https://www.youtube.com/watch?v=5qap5aO4i9A",
-                  "https://www.youtube.com/watch?v=cGYyOY4XaFs",
-                  "https://www.youtube.com/watch?v=M2NcuP5mRqs",
-                  ]
+RELAXING_MUSIC = [
+    "https://www.youtube.com/watch?v=5qap5aO4i9A",
+    "https://www.youtube.com/watch?v=cGYyOY4XaFs",
+    "https://www.youtube.com/watch?v=M2NcuP5mRqs",
+]
 APP_PASSWORD = "yrzvzurdmjrkiymn"
 EMAIL_USER = "aryananand.chess@gmail.com"
 IMAP_URL = "imap.gmail.com"
@@ -120,7 +124,7 @@ stop_words = list(set(stopwords.words("english")))
 
 
 def remove_punctuation(sentence):
-    sentence = re.sub(r'[^\w\s]', '', sentence)
+    sentence = re.sub(r"[^\w\s]", "", sentence)
     return sentence
 
 
@@ -151,7 +155,15 @@ def get_body(msg):
 
 
 def internet_search(request):
-    synonyms_for_internet = ['internet', 'net', 'cyberspace', 'web', 'World_Wide_Web', 'WWW', 'google']
+    synonyms_for_internet = [
+        "internet",
+        "net",
+        "cyberspace",
+        "web",
+        "World_Wide_Web",
+        "WWW",
+        "google",
+    ]
 
     request = request.replace("world wide web ", "")
     request = request.replace(" world wide web", "")
@@ -167,19 +179,14 @@ def internet_search(request):
         i
         for i in pos
         if i[0] != "search"
-           and all(
-            word_here.lower() != i[0]
-            for word_here in synonyms_for_internet
-        )
-           and i[1] != "MD"
-           and i[0] != "please"
-           and i[0] != "get"
+        and all(word_here.lower() != i[0] for word_here in synonyms_for_internet)
+        and i[1] != "MD"
+        and i[0] != "please"
+        and i[0] != "get"
     ]
 
     query = "".join(i[0] + " " for i in new_pos)
-    search_results = [
-        i for i in search(query)
-    ]
+    search_results = [i for i in search(query)]
 
     search_query = query.replace(" ", "+")
 
@@ -207,7 +214,7 @@ def image_to_ascii_art(img_path, height_factor=0.4, output_file="", output_dec=F
 
     new_pixels_count = len(new_pixels)
     ascii_image = [
-        new_pixels[index: index + new_width]
+        new_pixels[index : index + new_width]
         for index in range(0, new_pixels_count, new_width)
     ]
     ascii_image = "\n".join(ascii_image)
@@ -220,16 +227,16 @@ def image_to_ascii_art(img_path, height_factor=0.4, output_file="", output_dec=F
 def get_info(tag, request, previous=False):
     # sourcery skip: extract-duplicate-method, extract-method, split-or-ifs
     if tag in ["weather", "temperature"]:
-        info = requests.get('https://ipinfo.io')
+        info = requests.get("https://ipinfo.io")
         data = info.json()
-        city = data['city']
-        region = data['region']
-        country = data['country']
+        city = data["city"]
+        region = data["region"]
+        country = data["country"]
         app_id = "WE385L-EVQWJ72XK8"
         client = wolf.Client(app_id)
-        result = client.query('weather forecast for' + city + ', ' + country)
+        result = client.query("weather forecast for" + city + ", " + country)
         weather = next(result.results).text
-        w = weather.split('\n')
+        w = weather.split("\n")
 
         ARGUMENTS[0] = ""
         ARGUMENTS[1] = ""
@@ -241,7 +248,11 @@ def get_info(tag, request, previous=False):
 
     elif tag == "screenshot":
         time_at_the_moment = dt.datetime.now()
-        file_name = ".\\screenshots\\" + str(time_at_the_moment).replace(":", "-") + "-screenshot.png"
+        file_name = (
+            ".\\screenshots\\"
+            + str(time_at_the_moment).replace(":", "-")
+            + "-screenshot.png"
+        )
         img = pag.screenshot()
         img.save(file_name)
 
@@ -259,8 +270,13 @@ def get_info(tag, request, previous=False):
         pos = pos[0]
 
         new_pos = [
-            i for i in pos
-            if i[0] != "music" and i[0] != "play" and i[0] != "song" and i[1] != "MD" and i[0] != "please"
+            i
+            for i in pos
+            if i[0] != "music"
+            and i[0] != "play"
+            and i[0] != "song"
+            and i[1] != "MD"
+            and i[0] != "please"
         ]
 
         song_name = "".join(i[0] for i in new_pos)
@@ -284,7 +300,9 @@ def get_info(tag, request, previous=False):
             # query = input("What do you what to search on wikipedia?\n")
 
             cleaned_query = [remove_punctuation(request)]
-            speech_words_in_query = [word_tokenize(sentence) for sentence in cleaned_query]
+            speech_words_in_query = [
+                word_tokenize(sentence) for sentence in cleaned_query
+            ]
             filtered_query = [remove_stopword(s) for s in speech_words_in_query]
             pos = [nltk.pos_tag(tokenized_sent) for tokenized_sent in filtered_query]
 
@@ -293,8 +311,12 @@ def get_info(tag, request, previous=False):
             new_pos = [
                 i
                 for i in pos
-                if i[0] != "wiki" and i[0] != "search" and i[0] != "wikipedia" and i[1] != "MD" and i[0] != "please"
-                   and i[0] != "get"
+                if i[0] != "wiki"
+                and i[0] != "search"
+                and i[0] != "wikipedia"
+                and i[1] != "MD"
+                and i[0] != "please"
+                and i[0] != "get"
             ]
 
             query = "".join(i[0] for i in new_pos)
@@ -311,7 +333,9 @@ def get_info(tag, request, previous=False):
             # --------------------------------
 
             cleaned_query = [remove_punctuation(request)]
-            speech_words_in_query = [word_tokenize(sentence) for sentence in cleaned_query]
+            speech_words_in_query = [
+                word_tokenize(sentence) for sentence in cleaned_query
+            ]
             filtered_query = [remove_stopword(s) for s in speech_words_in_query]
             pos = [nltk.pos_tag(tokenized_sent) for tokenized_sent in filtered_query]
 
@@ -320,8 +344,12 @@ def get_info(tag, request, previous=False):
             new_pos = [
                 i
                 for i in pos
-                if i[0] != "wiki" and i[0] != "search" and i[0] != "wikipedia" and i[1] != "MD" and i[0] != "please"
-                   and i[0] != "get"
+                if i[0] != "wiki"
+                and i[0] != "search"
+                and i[0] != "wikipedia"
+                and i[1] != "MD"
+                and i[0] != "please"
+                and i[0] != "get"
             ]
 
             query = "".join(i[0] + " " for i in new_pos)
@@ -344,8 +372,17 @@ def get_info(tag, request, previous=False):
         return return_links, search_link
 
     elif tag == "review":
-        synonyms_for_internet_and_review = ['internet', 'net', 'cyberspace', 'web', 'World_Wide_Web', 'WWW', 'google',
-                                            "review", "imdb"]
+        synonyms_for_internet_and_review = [
+            "internet",
+            "net",
+            "cyberspace",
+            "web",
+            "World_Wide_Web",
+            "WWW",
+            "google",
+            "review",
+            "imdb",
+        ]
 
         request = request.replace("world wide web ", "")
         request = request.replace(" world wide web", "")
@@ -361,13 +398,13 @@ def get_info(tag, request, previous=False):
             i
             for i in pos
             if i[0] != "search"
-               and all(
+            and all(
                 word_here.lower() != i[0]
                 for word_here in synonyms_for_internet_and_review
             )
-               and i[1] != "MD"
-               and i[0] != "please"
-               and i[0] != "get"
+            and i[1] != "MD"
+            and i[0] != "please"
+            and i[0] != "get"
         ]
 
         query = "".join(i[0] + " " for i in new_pos)
@@ -449,13 +486,15 @@ def get_info(tag, request, previous=False):
         con = imaplib.IMAP4_SSL(IMAP_URL)
         con.login(EMAIL_USER, APP_PASSWORD)
 
-        con.select('Primary')
+        con.select("Primary")
 
         num = con.select("Primary")
-        result, data = con.fetch(num[1][0], '(RFC822)')
+        result, data = con.fetch(num[1][0], "(RFC822)")
         raw = email.message_from_bytes(data[0][1])
 
-        sender = parseaddr(HeaderParser().parsestr(data[0][1].decode("utf-8"))["From"])[1]
+        sender = parseaddr(HeaderParser().parsestr(data[0][1].decode("utf-8"))["From"])[
+            1
+        ]
 
         ARGUMENTS[0] = "read_email"
         ARGUMENTS[1] = sender[1]
@@ -463,7 +502,7 @@ def get_info(tag, request, previous=False):
         return get_body(raw).decode("utf-8"), sender[0]
 
     elif tag == "write_email":
-        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server = smtplib.SMTP("smtp.gmail.com", 587)
         server.ehlo()
         server.starttls()
         server.ehlo()
@@ -475,11 +514,7 @@ def get_info(tag, request, previous=False):
 
         msg = f"Subject: {subject}\n\n{body}"
 
-        server.sendmail(
-            'JARVIS',
-            receiver,
-            msg
-        )
+        server.sendmail("JARVIS", receiver, msg)
 
         ARGUMENTS[0] = ""
         ARGUMENTS[1] = ""
@@ -509,7 +544,7 @@ def get_info(tag, request, previous=False):
                 ARGUMENTS[1] = joke.get_joke()
 
             elif ARGUMENTS[0] == "read_email":
-                server = smtplib.SMTP('smtp.gmail.com', 587)
+                server = smtplib.SMTP("smtp.gmail.com", 587)
                 server.ehlo()
                 server.starttls()
                 server.ehlo()
@@ -521,11 +556,7 @@ def get_info(tag, request, previous=False):
 
                 msg = f"Subject: {subject}\n\n{body}"
 
-                server.sendmail(
-                    'JARVIS',
-                    receiver,
-                    msg
-                )
+                server.sendmail("JARVIS", receiver, msg)
 
                 ARGUMENTS[0] = ""
                 ARGUMENTS[1] = ""
