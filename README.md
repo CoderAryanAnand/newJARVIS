@@ -24,5 +24,12 @@ Goodbye!
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
+## Credits
+Credit to NeuralNine's YouTube [video](https://youtu.be/1lwddP0KUEg) on ML Chatbots.
+
+He showed me how to make the ``training.py`` and ``chatbot.py``. I added a few arguments after that,
+like "type" (see intents.json). I don't completely understand the entire code, but I think
+I understand enough.
+
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
