@@ -40,6 +40,9 @@ from newsapi import NewsApiClient
 from PIL import Image
 from bs4 import BeautifulSoup
 
+from rich.console import Console
+from rich.progress import track
+
 from tensorflow.keras.models import load_model
 from shlex import quote as shlex_quote
 
@@ -68,11 +71,13 @@ APP_PASSWORD = "yrzvzurdmjrkiymn"
 EMAIL_USER = "aryananand.chess@gmail.com"
 IMAP_URL = "imap.gmail.com"
 
+console = Console()
+
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
-logging.info(classes)
-logging.info(types)
-logging.info(words)
+console.log(classes)
+console.log(types)
+console.log(words)
 
 # TODO
 """
@@ -538,12 +543,12 @@ def get_info(tag, request, previous=False):
                 ARGUMENTS[1] = ""
 
             elif ARGUMENTS[0] in ["time", "date"]:
-                print(ARGUMENTS[1])
+                console.print(ARGUMENTS[1])
                 ARGUMENTS[0] = ""
                 ARGUMENTS[1] = ""
 
             elif ARGUMENTS[0] == "joke":
-                print(f"{ARGUMENTS[1]}\nDo you want to hear another one?")
+                console.print(f"{ARGUMENTS[1]}\nDo you want to hear another one?")
                 ARGUMENTS[0] = "joke"
                 ARGUMENTS[1] = joke.get_joke()
 
@@ -619,14 +624,14 @@ def get_response(intents_list, intents_json):
                 break
     except IndexError:
         result = ""
-        print("I don't understand!")
-        print("Do you want me search this on the internet?")
+        console.print("I don't understand!")
+        console.print("Do you want me search this on the internet?")
         ARGUMENTS[0] = "internet_search"
         ARGUMENTS[1] = message
     return result
 
 
-print("Started...")
+console.print("Started...")
 """
 speech = "Chess.com acquired the rights and is an official broadcast partner. On our LIVE page, you'll be able to " \
          "follow the live moves with computer analysis, live chat, and video commentary by grandmasters and special " \
@@ -686,11 +691,11 @@ speech_words2.concordance("great")
 #     print('\t', synonym)
 
 print("\n" * 150, image_to_ascii_art("index.jpg", 0.37, 80))
-print("\n", image_to_ascii_art("index.png", 0.37, 40))
+console.print("\n", image_to_ascii_art("index.png", 0.37, 40))
 
 while True:
     message = input("> ")
 
     ints = predict_class(message)
     res = get_response(ints, intents)
-    print(res)
+    console.print(res)
