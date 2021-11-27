@@ -3,6 +3,8 @@ import json
 import pickle
 import numpy as np
 
+from tqdm import tqdm, trange
+
 import nltk
 from nltk.stem import WordNetLemmatizer
 
@@ -19,7 +21,7 @@ types = []
 documents = []
 ignore_letters = ["?", "!", ".", ","]
 
-for intent in intents["intents"]:
+for intent in tqdm(intents["intents"]):
     for pattern in intent["patterns"]:
         word_list = nltk.word_tokenize(pattern)
         words.extend(word_list)
@@ -39,7 +41,7 @@ pickle.dump(types, open("models/types.pkl", "wb"))
 training = []
 output_empty = [0] * len(classes)
 
-for document in documents:
+for document in tqdm(documents):
     bag = []
     word_patterns = document[0]
     word_patterns = [lemmatizer.lemmatize(word.lower()) for word in word_patterns]

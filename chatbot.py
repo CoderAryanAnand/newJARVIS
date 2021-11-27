@@ -41,7 +41,7 @@ from PIL import Image
 from bs4 import BeautifulSoup
 
 from rich.console import Console
-from rich.progress import track
+from tqdm import tqdm, trange
 
 from tensorflow.keras.models import load_model
 from shlex import quote as shlex_quote
@@ -54,9 +54,7 @@ classes = pickle.load(open("models/classes.pkl", "rb"))
 types = pickle.load(open("models/types.pkl", "rb"))
 model = load_model("models/chatbotmodel.h5")
 
-ssl._create_default_https_context = (
-    ssl._create_unverified_context
-)  # potential security risk, but needed here
+ssl._create_default_https_context = ssl._create_unverified_context  # potential security risk, but needed here
 
 API_KEY = "d4a8a95799bc4f3d9a34ac59cebaa456"
 DEFAULT_NEWS_SOURCE = "bbc-news"
@@ -67,6 +65,7 @@ RELAXING_MUSIC = [
     "https://www.youtube.com/watch?v=cGYyOY4XaFs",
     "https://www.youtube.com/watch?v=M2NcuP5mRqs",
 ]
+NO_ANSWER_RESPONSES = ["Sorry, can't understand you", "Please give me more info", "Not sure I understand"]
 APP_PASSWORD = "yrzvzurdmjrkiymn"
 EMAIL_USER = "aryananand.chess@gmail.com"
 IMAP_URL = "imap.gmail.com"
@@ -289,6 +288,7 @@ def get_info(tag, request, previous=False):
         ]
 
         song_name = "".join(i[0] for i in new_pos)
+        song_name = song_name if song_name != "" else random.choice(RELAXING_MUSIC)
         kit.playonyt(song_name)
 
         ARGUMENTS[0] = ""
@@ -593,14 +593,23 @@ def predict_class(sentence):
     error_threshold = 0.25
     results = [[i, r] for i, r in enumerate(result_of_model) if r > error_threshold]
     results.sort(key=lambda x: x[1], reverse=True)
-    return [
-        {
-            "intent": classes[r[0]],
-            "probability": str(r[1]),
-            "type_of_intent": types[r[0]],
-        }
-        for r in results
-    ]
+    sentence = sentence.replace(" ", "")
+    console.log(results)
+    if sentence != "":
+        return [
+            {
+                "intent": classes[r[0]],
+                "probability": str(r[1]),
+                "type_of_intent": types[r[0]],
+            }
+            for r in results
+        ]
+    else:
+        return [{
+                "intent": "no_answer",
+                "probability": "0.9629686",
+                "type_of_intent": "n",
+            }]
 
 
 def get_response(intents_list, intents_json):
@@ -618,10 +627,16 @@ def get_response(intents_list, intents_json):
                     info = get_info(tag, message)
                     # print(info)
                     result = random.choice(i["responses"]).format(info)
-                else:
+                elif ARGUMENTS[0] != "" and ARGUMENTS[1] != "":
                     get_info(tag, message, previous=True)
                     result = ""
+                else:
+                    result = "Ok..."
                 break
+            elif tag == "no_answer":
+                result = random.choice(NO_ANSWER_RESPONSES)
+                ARGUMENTS[0] = ""
+                ARGUMENTS[1] = ""
     except IndexError:
         result = ""
         console.print("I don't understand!")

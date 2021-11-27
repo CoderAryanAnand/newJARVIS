@@ -1,6 +1,6 @@
 {"intents": [
   {"tag": "greeting",
-    "patterns": ["Hi", "How are you", "Is anyone there?", "Hello", "Good day", "Whats up", "Hey", "greetings", "Sup"],
+    "patterns": ["Hi", "How are you", "Is anyone there?", "Hello", "Good day", "Whats up", "Hey", "greetings", "Sup", "Hi", "How are you", "Is anyone there?", "Hello", "Good day", "Whats up", "Hey", "greetings", "Sup", "Hi", "How are you", "Is anyone there?", "Hello", "Good day", "Whats up", "Hey", "greetings", "Sup"],
     "responses": ["Hello!", "Good to see you again!", "Hi there, how can I help?"],
     "type": "n"
   },
@@ -89,11 +89,6 @@
     "responses": ["It is {}\nDo you want to know the time?", "Today is {}\nDo you want to know the time?", "{}\nDo you want to know the time?"],
     "type": "y"
   },
-  {"tag": "no_answer",
-  "patterns": ["", " "],
-  "responses": ["Sorry, can't understand you", "Please give me more info", "Not sure I understand"],
-  "type": "n"
-  },
   {"tag": "options",
   "patterns": ["How you could help me?", "What you can do?", "What help you provide?", "How you can be helpful?", "What support is offered"],
   "responses": ["Ease your lifestyle by playing music, searching wikipedia, etc", "Solve mathematical expression, play some music etc", "Whatever you say"],
@@ -120,7 +115,13 @@
   "type": "y"},
   {"tag": "no",
   "patterns": ["nope", "no thanks", "no", "no thx", "no but thank you", "negative", "nah", "no way", "naw", "nay", "not really", "absolutely not", "never", "by no means", "not", "not really", "nae", "most certainly not", "no indeed"],
-  "responses": ["Oh ok...", "Alright.", "Anything else I can help with?"],
-  "type": "n"}
+  "responses": ["Alright.", "Anything else I can help with?"],
+  "type": "n"},
+  {
+    "tag": "thanks",
+    "patterns": ["Thanks", "Thank you", "That's helpful", "Thanks a lot!", "Thx", "That is helpful", "That was very helpful", "Thank you very much"],
+    "responses": ["Happy to help!", "Any time!", "My pleasure"],
+    "type": "n"
+  }
 ]
 }
