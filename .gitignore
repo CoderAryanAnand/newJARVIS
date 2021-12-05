@@ -145,3 +145,6 @@ temp.py
 email_body.html
 new_temp.py
 nnew_temp.py
+
+client_secret.json
+gmail_token.json
