@@ -1,5 +1,11 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Creator: Aryan](https://img.shields.io/badge/creator-Aryan-darkblue)](https://github.com/CoderAryanAnand)
+[![License: MIT](https://img.shields.io/apm/l/vim-mode)](https://opensource.org/licenses/MIT)
 
+[![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)](https://python.org)
+[![PyCharm](https://img.shields.io/badge/pycharm-143?style=for-the-badge&logo=pycharm&logoColor=black&color=black&labelColor=green)](https://www.jetbrains.com/pycharm/)
+[![Git](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white)](https://git-scm.com/)
+[![CodeFactor](https://www.codefactor.io/repository/github/coderaryananand/newjarvis/badge?s=7afcffca7522ae239b08dcb1fedd61bd81913e79)](https://www.codefactor.io/repository/github/coderaryananand/newjarvis)
 # JARVIS
 
 A new and improved version of the JARVIS I created in 2020
