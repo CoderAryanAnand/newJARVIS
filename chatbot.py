@@ -604,12 +604,11 @@ def predict_class(sentence):
             }
             for r in results
         ]
-    else:
-        return [{
-                "intent": "no_answer",
-                "probability": "0.9629686",
-                "type_of_intent": "n",
-            }]
+    return [{
+            "intent": "no_answer",
+            "probability": "0.9629686",
+            "type_of_intent": "n",
+        }]
 
 
 def get_response(intents_list, intents_json):
