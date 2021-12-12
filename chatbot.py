@@ -14,6 +14,7 @@ import numpy as np
 import ssl
 
 # import curses
+import subprocess
 
 import requests
 import psutil
@@ -73,6 +74,12 @@ IMAP_URL = "imap.gmail.com"
 console = Console()
 
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+
+server = smtplib.SMTP("smtp.gmail.com", 587)
+server.ehlo()
+server.starttls()
+server.ehlo()
+server.login(EMAIL_USER, APP_PASSWORD)
 
 console.log(classes)
 console.log(types)
@@ -151,15 +158,13 @@ def get_date():
         return f"{weekday}, the {day}nd of {month}, {year}."
     elif day in [3, 23]:
         return f"{weekday}, the {day}rd of {month}, {year}."
-    else:
-        return f"{weekday}, the {day}th of {month}, {year}."
+    return f"{weekday}, the {day}th of {month}, {year}."
 
 
 def get_body(msg):
     if msg.is_multipart():
         return get_body(msg.get_payload(0))
-    else:
-        return msg.get_payload(None, True)
+    return msg.get_payload(None, True)
 
 
 def internet_search(request):
@@ -232,6 +237,251 @@ def image_to_ascii_art(img_path, height_factor=0.4, new_width=80, output_file=""
     return ascii_image
 
 
+def screenshot():
+    time_at_the_moment = dt.datetime.now()
+    file_name = (
+            ".\\screenshots\\"
+            + str(time_at_the_moment).replace(":", "-")
+            + "-screenshot.png"
+    )
+    img = pag.screenshot()
+    img.save(file_name)
+
+    ARGUMENTS[0] = "screenshot"
+    ARGUMENTS[1] = f"{os.path.abspath(file_name)}"
+
+
+def play_song(request):
+    cleaned_query = [remove_punctuation(request)]
+    speech_words_in_query = [word_tokenize(sentence) for sentence in cleaned_query]
+    filtered_query = [remove_stopword(s) for s in speech_words_in_query]
+    pos = [nltk.pos_tag(tokenized_sent) for tokenized_sent in filtered_query]
+
+    pos = pos[0]
+
+    new_pos = [
+        i
+        for i in pos
+        if i[0] != "music"
+           and i[0] != "play"
+           and i[0] != "song"
+           and i[1] != "MD"
+           and i[0] != "please"
+    ]
+
+    song_name = "".join(i[0] for i in new_pos)
+    song_name = song_name if song_name != "" else random.choice(RELAXING_MUSIC)
+    kit.playonyt(song_name)
+
+
+def search_wikipedia(request):
+    try:
+        # query = input("What do you what to search on wikipedia?\n")
+
+        cleaned_query = [remove_punctuation(request)]
+        speech_words_in_query = [
+            word_tokenize(sentence) for sentence in cleaned_query
+        ]
+        filtered_query = [remove_stopword(s) for s in speech_words_in_query]
+        pos = [nltk.pos_tag(tokenized_sent) for tokenized_sent in filtered_query]
+
+        pos = pos[0]
+
+        new_pos = [
+            i
+            for i in pos
+            if i[0] != "wiki"
+               and i[0] != "search"
+               and i[0] != "wikipedia"
+               and i[1] != "MD"
+               and i[0] != "please"
+               and i[0] != "get"
+        ]
+
+        query = "".join(i[0] for i in new_pos)
+        query = query.replace(" ", "")
+        results = wiki.summary(query, sentences=2)
+        result_page = wiki.page(query)
+        return results, result_page.url
+    except wiki.exceptions.PageError:
+        return ""
+    finally:
+
+        search_wikipedia_google(request)
+
+
+def search_wikipedia_google(request):
+    # --------------------------------
+    # SEPARATION FROM WIKIPEDIA TO SEARCH
+    # --------------------------------
+
+    cleaned_query = [remove_punctuation(request)]
+    speech_words_in_query = [
+        word_tokenize(sentence) for sentence in cleaned_query
+    ]
+    filtered_query = [remove_stopword(s) for s in speech_words_in_query]
+    pos = [nltk.pos_tag(tokenized_sent) for tokenized_sent in filtered_query]
+
+    pos = pos[0]
+
+    new_pos = [
+        i
+        for i in pos
+        if i[0] != "wiki"
+           and i[0] != "search"
+           and i[0] != "wikipedia"
+           and i[1] != "MD"
+           and i[0] != "please"
+           and i[0] != "get"
+    ]
+
+    query = "".join(i[0] + " " for i in new_pos)
+
+    query = "".join(i[0] for i in new_pos)
+
+    search_query = query.replace(" ", "+")
+
+    search_link = f"https://www.google.com/search?q={search_query}"
+
+    ARGUMENTS[0] = "wikipedia"
+    ARGUMENTS[1] = search_link
+
+
+def review(request):
+    synonyms_for_internet_and_review = [
+        "internet",
+        "net",
+        "cyberspace",
+        "web",
+        "World_Wide_Web",
+        "WWW",
+        "google",
+        "review",
+        "imdb",
+    ]
+
+    request = request.replace("world wide web ", "")
+    request = request.replace(" world wide web", "")
+
+    cleaned_query = [remove_punctuation(request)]
+    speech_words_in_query = [word_tokenize(sentence) for sentence in cleaned_query]
+    filtered_query = [remove_stopword(s) for s in speech_words_in_query]
+    pos = [nltk.pos_tag(tokenized_sent) for tokenized_sent in filtered_query]
+
+    pos = pos[0]
+
+    new_pos = [
+        i
+        for i in pos
+        if i[0] != "search"
+           and all(
+            word_here.lower() != i[0]
+            for word_here in synonyms_for_internet_and_review
+        )
+           and i[1] != "MD"
+           and i[0] != "please"
+           and i[0] != "get"
+    ]
+
+    query = "".join(i[0] + " " for i in new_pos)
+    imdb_review = ImdbSpider(query)
+
+    # --------------------------------
+    # SEPARATION FROM REVIEW TO SEARCH
+    # --------------------------------
+
+    query = "".join(i[0] for i in new_pos)
+
+    search_query = query.replace(" ", "+")
+
+    search_link = f"https://www.google.com/search?q={search_query}"
+
+    ARGUMENTS[0] = "review"
+    ARGUMENTS[1] = search_link
+
+    return imdb_review.get_rating(), imdb_review.get_link()
+
+
+def news():
+    article = NEWS_API.get_top_headlines(sources=DEFAULT_NEWS_SOURCE)
+
+    url = article[0]["url"]
+    article = Article(url)
+
+    article.download()
+    article.parse()
+
+    article.nlp()
+    analysis = TextBlob(article.text)
+
+    ARGUMENTS[0] = "news"
+    ARGUMENTS[1] = url
+
+    return analysis, url
+
+
+def cpu():
+    usage = str(psutil.cpu_percent())
+    battery = str(psutil.sensors_battery().percent)
+    plugged_in = psutil.sensors_battery().power_plugged
+    plugged_in = "is" if plugged_in else "is not"
+
+    ARGUMENTS[0] = ""
+    ARGUMENTS[1] = ""
+
+    return usage, battery, plugged_in
+
+
+def note():
+    date = str(dt.datetime.now()).replace(":", "-")[:-7]
+    file_name = f"notes/{date}-note.txt"
+
+    text = input("What do you want to write to your file?")
+
+    with open(file_name, "w") as f:
+        f.write(text)
+
+    ARGUMENTS[0] = "note"
+    ARGUMENTS[1] = f"notepad.exe {os.path.abspath(file_name)}"
+
+    return os.path.abspath(file_name)
+
+
+def read_email():
+    con = imaplib.IMAP4_SSL(IMAP_URL)
+    con.login(EMAIL_USER, APP_PASSWORD)
+
+    con.select("Primary")
+
+    num = con.select("Primary")
+    result, data = con.fetch(num[1][0], "(RFC822)")
+    raw = email.message_from_bytes(data[0][1])
+
+    sender = parseaddr(HeaderParser().parsestr(data[0][1].decode("utf-8"))["From"])[
+        1
+    ]
+
+    ARGUMENTS[0] = "read_email"
+    ARGUMENTS[1] = sender[1]
+
+    return get_body(raw).decode("utf-8"), sender[0]
+
+
+def write_email():
+    receiver = input("Receiver: ")
+    subject = input("Subject: ")
+    body = input("Content: ")
+
+    msg = f"Subject: {subject}\n\n{body}"
+
+    server.sendmail("JARVIS", receiver, msg)
+
+    ARGUMENTS[0] = ""
+    ARGUMENTS[1] = ""
+
+    return
+
+
 def get_info(tag, request, previous=False):
     # sourcery skip: extract-duplicate-method, extract-method, split-or-ifs
     if tag in ["weather", "temperature"]:
@@ -251,45 +501,15 @@ def get_info(tag, request, previous=False):
 
         if tag == "temperature":
             return w[0]
-        else:
-            return w[1]
+        return w[1]
 
     elif tag == "screenshot":
-        time_at_the_moment = dt.datetime.now()
-        file_name = (
-                ".\\screenshots\\"
-                + str(time_at_the_moment).replace(":", "-")
-                + "-screenshot.png"
-        )
-        img = pag.screenshot()
-        img.save(file_name)
-
-        ARGUMENTS[0] = "screenshot"
-        ARGUMENTS[1] = f"{os.path.abspath(file_name)}"
+        screenshot()
 
         return
 
     elif tag == "song":
-        cleaned_query = [remove_punctuation(request)]
-        speech_words_in_query = [word_tokenize(sentence) for sentence in cleaned_query]
-        filtered_query = [remove_stopword(s) for s in speech_words_in_query]
-        pos = [nltk.pos_tag(tokenized_sent) for tokenized_sent in filtered_query]
-
-        pos = pos[0]
-
-        new_pos = [
-            i
-            for i in pos
-            if i[0] != "music"
-               and i[0] != "play"
-               and i[0] != "song"
-               and i[1] != "MD"
-               and i[0] != "please"
-        ]
-
-        song_name = "".join(i[0] for i in new_pos)
-        song_name = song_name if song_name != "" else random.choice(RELAXING_MUSIC)
-        kit.playonyt(song_name)
+        play_song(request)
 
         ARGUMENTS[0] = ""
         ARGUMENTS[1] = ""
@@ -305,72 +525,7 @@ def get_info(tag, request, previous=False):
         return
 
     elif tag == "wikipedia":
-        try:
-            # query = input("What do you what to search on wikipedia?\n")
-
-            cleaned_query = [remove_punctuation(request)]
-            speech_words_in_query = [
-                word_tokenize(sentence) for sentence in cleaned_query
-            ]
-            filtered_query = [remove_stopword(s) for s in speech_words_in_query]
-            pos = [nltk.pos_tag(tokenized_sent) for tokenized_sent in filtered_query]
-
-            pos = pos[0]
-
-            new_pos = [
-                i
-                for i in pos
-                if i[0] != "wiki"
-                   and i[0] != "search"
-                   and i[0] != "wikipedia"
-                   and i[1] != "MD"
-                   and i[0] != "please"
-                   and i[0] != "get"
-            ]
-
-            query = "".join(i[0] for i in new_pos)
-            query = query.replace(" ", "")
-            results = wiki.summary(query, sentences=2)
-            result_page = wiki.page(query)
-            return results, result_page.url
-        except wiki.exceptions.PageError:
-            return ""
-        finally:
-
-            # --------------------------------
-            # SEPARATION FROM WIKIPEDIA TO SEARCH
-            # --------------------------------
-
-            cleaned_query = [remove_punctuation(request)]
-            speech_words_in_query = [
-                word_tokenize(sentence) for sentence in cleaned_query
-            ]
-            filtered_query = [remove_stopword(s) for s in speech_words_in_query]
-            pos = [nltk.pos_tag(tokenized_sent) for tokenized_sent in filtered_query]
-
-            pos = pos[0]
-
-            new_pos = [
-                i
-                for i in pos
-                if i[0] != "wiki"
-                   and i[0] != "search"
-                   and i[0] != "wikipedia"
-                   and i[1] != "MD"
-                   and i[0] != "please"
-                   and i[0] != "get"
-            ]
-
-            query = "".join(i[0] + " " for i in new_pos)
-
-            query = "".join(i[0] for i in new_pos)
-
-            search_query = query.replace(" ", "+")
-
-            search_link = f"https://www.google.com/search?q={search_query}"
-
-            ARGUMENTS[0] = "wikipedia"
-            ARGUMENTS[1] = search_link
+        search_wikipedia(request)
 
     elif tag == "internet_search":
         return_links, search_link = internet_search(request)
@@ -381,84 +536,18 @@ def get_info(tag, request, previous=False):
         return return_links, search_link
 
     elif tag == "review":
-        synonyms_for_internet_and_review = [
-            "internet",
-            "net",
-            "cyberspace",
-            "web",
-            "World_Wide_Web",
-            "WWW",
-            "google",
-            "review",
-            "imdb",
-        ]
 
-        request = request.replace("world wide web ", "")
-        request = request.replace(" world wide web", "")
+        rating, link = review(request)
 
-        cleaned_query = [remove_punctuation(request)]
-        speech_words_in_query = [word_tokenize(sentence) for sentence in cleaned_query]
-        filtered_query = [remove_stopword(s) for s in speech_words_in_query]
-        pos = [nltk.pos_tag(tokenized_sent) for tokenized_sent in filtered_query]
-
-        pos = pos[0]
-
-        new_pos = [
-            i
-            for i in pos
-            if i[0] != "search"
-               and all(
-                word_here.lower() != i[0]
-                for word_here in synonyms_for_internet_and_review
-            )
-               and i[1] != "MD"
-               and i[0] != "please"
-               and i[0] != "get"
-        ]
-
-        query = "".join(i[0] + " " for i in new_pos)
-        imdb_review = ImdbSpider(query)
-
-        # --------------------------------
-        # SEPARATION FROM REVIEW TO SEARCH
-        # --------------------------------
-
-        query = "".join(i[0] for i in new_pos)
-
-        search_query = query.replace(" ", "+")
-
-        search_link = f"https://www.google.com/search?q={search_query}"
-
-        ARGUMENTS[0] = "review"
-        ARGUMENTS[1] = search_link
-
-        return imdb_review.get_rating(), imdb_review.get_link()
+        return rating, link
 
     elif tag == "news":
-        article = NEWS_API.get_top_headlines(sources=DEFAULT_NEWS_SOURCE)
-
-        url = article[0]["url"]
-        article = Article(url)
-
-        article.download()
-        article.parse()
-
-        article.nlp()
-        analysis = TextBlob(article.text)
-
-        ARGUMENTS[0] = "news"
-        ARGUMENTS[1] = url
+        analysis, url = news()
 
         return analysis, url
 
     elif tag == "cpu":
-        usage = str(psutil.cpu_percent())
-        battery = str(psutil.sensors_battery().percent)
-        plugged_in = psutil.sensors_battery().power_plugged
-        plugged_in = "is" if plugged_in else "is not"
-
-        ARGUMENTS[0] = ""
-        ARGUMENTS[1] = ""
+        usage, battery, plugged_in = cpu()
 
         return usage, battery, plugged_in
 
@@ -478,62 +567,22 @@ def get_info(tag, request, previous=False):
         return get_date()
 
     elif tag == "note":
-        date = str(dt.datetime.now()).replace(":", "-")[:-7]
-        file_name = f"notes/{date}-note.txt"
-
-        text = input("What do you want to write to your file?")
-
-        with open(file_name, "w") as f:
-            f.write(text)
-
-        ARGUMENTS[0] = "note"
-        ARGUMENTS[1] = f"notepad.exe {os.path.abspath(file_name)}"
-
-        return os.path.abspath(file_name)
+        return note()
 
     elif tag == "read_email":
-        con = imaplib.IMAP4_SSL(IMAP_URL)
-        con.login(EMAIL_USER, APP_PASSWORD)
+        body, sender = read_email()
 
-        con.select("Primary")
-
-        num = con.select("Primary")
-        result, data = con.fetch(num[1][0], "(RFC822)")
-        raw = email.message_from_bytes(data[0][1])
-
-        sender = parseaddr(HeaderParser().parsestr(data[0][1].decode("utf-8"))["From"])[
-            1
-        ]
-
-        ARGUMENTS[0] = "read_email"
-        ARGUMENTS[1] = sender[1]
-
-        return get_body(raw).decode("utf-8"), sender[0]
+        return body, sender
 
     elif tag == "write_email":
-        server = smtplib.SMTP("smtp.gmail.com", 587)
-        server.ehlo()
-        server.starttls()
-        server.ehlo()
-        server.login(EMAIL_USER, APP_PASSWORD)
-
-        receiver = input("Receiver: ")
-        subject = input("Subject: ")
-        body = input("Content: ")
-
-        msg = f"Subject: {subject}\n\n{body}"
-
-        server.sendmail("JARVIS", receiver, msg)
-
-        ARGUMENTS[0] = ""
-        ARGUMENTS[1] = ""
+        write_email()
 
         return
 
     elif previous:
         if ARGUMENTS[0] != "" and ARGUMENTS[1] != "":
             if ARGUMENTS[0] in ["note", "screenshot"]:
-                os.system(ARGUMENTS[1])
+                subprocess.call(ARGUMENTS[1], shell=False)
                 ARGUMENTS[0] = ""
                 ARGUMENTS[1] = ""
 
