@@ -503,12 +503,12 @@ def get_info(tag, request, previous=False):
             return w[0]
         return w[1]
 
-    elif tag == "screenshot":
+    if tag == "screenshot":
         screenshot()
 
         return
 
-    elif tag == "song":
+    if tag == "song":
         play_song(request)
 
         ARGUMENTS[0] = ""
@@ -516,7 +516,7 @@ def get_info(tag, request, previous=False):
 
         return
 
-    elif tag == "relaxing_music":
+    if tag == "relaxing_music":
         kit.playonyt(random.choice(RELAXING_MUSIC))
 
         ARGUMENTS[0] = ""
@@ -524,10 +524,10 @@ def get_info(tag, request, previous=False):
 
         return
 
-    elif tag == "wikipedia":
+    if tag == "wikipedia":
         search_wikipedia(request)
 
-    elif tag == "internet_search":
+    if tag == "internet_search":
         return_links, search_link = internet_search(request)
 
         ARGUMENTS[0] = "internet_search"
@@ -535,51 +535,51 @@ def get_info(tag, request, previous=False):
 
         return return_links, search_link
 
-    elif tag == "review":
+    if tag == "review":
 
         rating, link = review(request)
 
         return rating, link
 
-    elif tag == "news":
+    if tag == "news":
         analysis, url = news()
 
         return analysis, url
 
-    elif tag == "cpu":
+    if tag == "cpu":
         usage, battery, plugged_in = cpu()
 
         return usage, battery, plugged_in
 
-    elif tag == "joke":
+    if tag == "joke":
         ARGUMENTS[0] = "joke"
         ARGUMENTS[1] = joke.get_joke()
         return joke.get_joke()
 
-    elif tag == "time":
+    if tag == "time":
         ARGUMENTS[0] = "time"
         ARGUMENTS[1] = get_date()
         return str(dt.datetime.now().time())[0:5]
 
-    elif tag == "date":
+    if tag == "date":
         ARGUMENTS[0] = "date"
         ARGUMENTS[1] = str(dt.datetime.now().time())[0:5]
         return get_date()
 
-    elif tag == "note":
+    if tag == "note":
         return note()
 
-    elif tag == "read_email":
+    if tag == "read_email":
         body, sender = read_email()
 
         return body, sender
 
-    elif tag == "write_email":
+    if tag == "write_email":
         write_email()
 
         return
 
-    elif previous:
+    if previous:
         if ARGUMENTS[0] != "" and ARGUMENTS[1] != "":
             if ARGUMENTS[0] in ["note", "screenshot"]:
                 subprocess.call(ARGUMENTS[1], shell=False)
@@ -602,12 +602,6 @@ def get_info(tag, request, previous=False):
                 ARGUMENTS[1] = joke.get_joke()
 
             elif ARGUMENTS[0] == "read_email":
-                server = smtplib.SMTP("smtp.gmail.com", 587)
-                server.ehlo()
-                server.starttls()
-                server.ehlo()
-                server.login(EMAIL_USER, APP_PASSWORD)
-
                 receiver = ARGUMENTS[1]
                 subject = input("Subject: ")
                 body = input("Content: ")
