@@ -7,6 +7,8 @@ import wikipedia as wiki
 from googlesearch import search
 from email.parser import HeaderParser
 from email.utils import parseaddr
+
+from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from scrapimdb import ImdbSpider
 from textblob import TextBlob
@@ -24,8 +26,7 @@ import smtplib
 import email
 import psutil
 import ssl
-
-from chatbot import remove_stopword, remove_punctuation
+import re
 
 ssl._create_default_https_context = (
     ssl._create_unverified_context
@@ -54,6 +55,17 @@ server.ehlo()
 server.starttls()
 server.ehlo()
 server.login(EMAIL_USER, APP_PASSWORD)
+
+stop_words = list(set(stopwords.words("english")))
+
+
+def remove_punctuation(sentence):
+    sentence = re.sub(r"[^\w\s]", "", sentence)
+    return sentence
+
+
+def remove_stopword(sentence):
+    return [w for w in sentence if w not in stop_words]
 
 
 def get_date():
@@ -201,6 +213,10 @@ def play_song(request):
     kit.playonyt(song_name)
 
 
+def relaxing_music():
+    kit.playonyt(random.choice(RELAXING_MUSIC))
+
+
 def search_wikipedia(request):
     try:
         # query = input("What do you what to search on wikipedia?\n")
@@ -223,15 +239,15 @@ def search_wikipedia(request):
             and i[0] != "get"
         ]
 
-        query = "".join(i[0] for i in new_pos)
+        query = " ".join(i[0] for i in new_pos)
+        search_query = query.replace(" ", "+")
         query = query.replace(" ", "")
         results = wiki.summary(query, sentences=2)
         result_page = wiki.page(query)
-        return results, result_page.url
+        return results, result_page.url, f"https://www.google.com/search?q={search_query}"
     except wiki.exceptions.PageError:
-        return ""
+        return "", ""
     finally:
-
         search_wikipedia_google(request)
 
 

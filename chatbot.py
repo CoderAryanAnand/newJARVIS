@@ -2,6 +2,8 @@ import os.path
 import logging
 import json
 import pickle
+import re
+import random
 import webbrowser
 
 import numpy as np
@@ -12,14 +14,17 @@ import subprocess
 
 
 import pyjokes as joke
+import datetime as dt
 
+import nltk
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 from rich.console import Console
 
 from tensorflow.keras.models import load_model
 
-from chatbot_utils import *
+from chatbot_utils import get_date, image_to_ascii_art, play_song, review, read_email, note, news, cpu, internet_search
+from chatbot_utils import screenshot, write_email, search_wikipedia, weather_and_temperature, relaxing_music, server
 
 lemmatizer = WordNetLemmatizer()
 intents = json.loads(open("intents.json").read())
@@ -31,13 +36,12 @@ model = load_model("models/chatbotmodel.h5")
 
 ssl._create_default_https_context = ssl._create_unverified_context  # potential security risk, but needed here
 
-NEWS_API = NewsApiClient(API_KEY)
 ARGUMENTS = ["", ""]
 NO_ANSWER_RESPONSES = ["Sorry, can't understand you", "Please give me more info", "Not sure I understand"]
 
 console = Console()
 
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+# logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
 console.log(classes)
 console.log(types)
@@ -106,7 +110,6 @@ def remove_stopword(sentence):
 
 
 def get_info(tag, request, previous=False):
-    # sourcery skip: extract-duplicate-method, extract-method, split-or-ifs
     if tag in ["weather", "temperature"]:
         ARGUMENTS[0] = ""
         ARGUMENTS[1] = ""
@@ -131,7 +134,7 @@ def get_info(tag, request, previous=False):
         return
 
     if tag == "relaxing_music":
-        kit.playonyt(random.choice(RELAXING_MUSIC))
+        relaxing_music()
 
         ARGUMENTS[0] = ""
         ARGUMENTS[1] = ""
@@ -139,10 +142,12 @@ def get_info(tag, request, previous=False):
         return
 
     if tag == "wikipedia":
-        search_link = search_wikipedia(request)
+        results, url, search_link = search_wikipedia(request)
 
         ARGUMENTS[0] = "wikipedia"
         ARGUMENTS[1] = search_link
+
+        return results, url
 
     if tag == "internet_search":
         return_links, search_link = internet_search(request)
@@ -272,7 +277,6 @@ def predict_class(sentence):
     results = [[i, r] for i, r in enumerate(result_of_model) if r > error_threshold]
     results.sort(key=lambda x: x[1], reverse=True)
     sentence = sentence.replace(" ", "")
-    console.log(results)
     if sentence != "":
         return [
             {
