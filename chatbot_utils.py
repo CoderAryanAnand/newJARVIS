@@ -150,7 +150,7 @@ def image_to_ascii_art(
 
     new_pixels_count = len(new_pixels)
     ascii_image = [
-        new_pixels[index: index + new_width]
+        new_pixels[index : index + new_width]
         for index in range(0, new_pixels_count, new_width)
     ]
     ascii_image = "\n".join(ascii_image)
@@ -244,7 +244,11 @@ def search_wikipedia(request):
         query = query.replace(" ", "")
         results = wiki.summary(query, sentences=2)
         result_page = wiki.page(query)
-        return results, result_page.url, f"https://www.google.com/search?q={search_query}"
+        return (
+            results,
+            result_page.url,
+            f"https://www.google.com/search?q={search_query}",
+        )
     except wiki.exceptions.PageError:
         return "", ""
     finally:
