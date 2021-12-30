@@ -316,7 +316,7 @@ def predict_class(sentence):
     ]
 
 
-def get_response(intents_list, intents_json):
+def get_response(intents_list, intents_json, msg):
     try:
         tag = intents_list[0]["intent"]
         type_of_intent = intents_list[0]["type_of_intent"]
@@ -328,11 +328,11 @@ def get_response(intents_list, intents_json):
                     ARGUMENTS[0] = ""
                     ARGUMENTS[1] = ""
                 elif tag != "continue_dialog":
-                    info = get_info(tag, message)
+                    info = get_info(tag, msg)
                     # print(info)
                     result = random.choice(i["responses"]).format(info)
                 elif ARGUMENTS[0] != "" and ARGUMENTS[1] != "":
-                    get_info(tag, message, previous=True)
+                    get_info(tag, msg, previous=True)
                     result = ""
                 else:
                     result = "Ok..."
@@ -417,5 +417,5 @@ if __name__ == "__main__":
         message = input("> ")
 
         ints = predict_class(message)
-        res = get_response(ints, intents)
+        res = get_response(ints, intents, message)
         console.print(res)
