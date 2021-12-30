@@ -23,8 +23,23 @@ from rich.console import Console
 
 from tensorflow.keras.models import load_model
 
-from chatbot_utils import get_date, image_to_ascii_art, play_song, review, read_email, note, news, cpu, internet_search
-from chatbot_utils import screenshot, write_email, search_wikipedia, weather_and_temperature, relaxing_music, server
+from chatbot_utils import (
+    get_date,
+    image_to_ascii_art,
+    play_song,
+    review,
+    read_email,
+    note,
+    news,
+    cpu,
+    internet_search,
+    screenshot,
+    write_email,
+    search_wikipedia,
+    weather_and_temperature,
+    relaxing_music,
+    server,
+)
 
 lemmatizer = WordNetLemmatizer()
 intents = json.loads(open("intents.json").read())
@@ -34,10 +49,16 @@ classes = pickle.load(open("models/classes.pkl", "rb"))
 types = pickle.load(open("models/types.pkl", "rb"))
 model = load_model("models/chatbotmodel.h5")
 
-ssl._create_default_https_context = ssl._create_unverified_context  # potential security risk, but needed here
+ssl._create_default_https_context = (
+    ssl._create_unverified_context
+)  # potential security risk, but needed here
 
 ARGUMENTS = ["", ""]
-NO_ANSWER_RESPONSES = ["Sorry, can't understand you", "Please give me more info", "Not sure I understand"]
+NO_ANSWER_RESPONSES = [
+    "Sorry, can't understand you",
+    "Please give me more info",
+    "Not sure I understand",
+]
 
 console = Console()
 
@@ -286,11 +307,13 @@ def predict_class(sentence):
             }
             for r in results
         ]
-    return [{
+    return [
+        {
             "intent": "no_answer",
             "probability": "0.9629686",
             "type_of_intent": "n",
-        }]
+        }
+    ]
 
 
 def get_response(intents_list, intents_json):
@@ -386,12 +409,13 @@ speech_words2.concordance("great")
 #   for synonym in unique:
 #     print('\t', synonym)
 
-print("\n" * 150, image_to_ascii_art("index.jpg", 0.37, 80))
-console.print("\n", image_to_ascii_art("index.png", 0.37, 40))
+if __name__ == "__main__":
+    print("\n" * 150, image_to_ascii_art("index.jpg", 0.37, 80))
+    console.print("\n", image_to_ascii_art("index.png", 0.37, 40))
 
-while True:
-    message = input("> ")
+    while True:
+        message = input("> ")
 
-    ints = predict_class(message)
-    res = get_response(ints, intents)
-    console.print(res)
+        ints = predict_class(message)
+        res = get_response(ints, intents)
+        console.print(res)
