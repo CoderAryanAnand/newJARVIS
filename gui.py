@@ -266,7 +266,7 @@ def make_window(theme, scale=None, win_size=(2560, 1440)):
         [sg.Text("Talk to Jarvis!", size=21)],
         [sg.HorizontalSeparator()],
         [sg.Multiline("", k="-MULTILINE-", expand_x=True, expand_y=True,disabled=True)],
-        [sg.Multiline(focus=True, key="-CHAT_INPUT-", enable_events=True, expand_x=True, size=(0, 20)),
+        [sg.Input(focus=True, key="-CHAT_INPUT-", enable_events=True, expand_x=True, size=(0, 20)),
          sg.Button("Enter", bind_return_key=True, size=(30, 20))]
 
     ]
@@ -374,7 +374,7 @@ def make_window(theme, scale=None, win_size=(2560, 1440)):
     print(f"\n\n\n{win_size}")
 
     return sg.Window(
-        "All Elements Demo",
+        "Your Personal Assistant",
         layout,
         element_justification="c",
         right_click_menu=right_click_menu_def,
@@ -550,7 +550,7 @@ def main():
                 window["-CHAT_INPUT-"].update("")
                 msg1 = f"You: {msg}"
                 textbox = window["-MULTILINE-"]
-                textbox.update(f"{textbox.get()}{msg1}")
+                textbox.update(f"{textbox.get()}\n\n{msg1}")
 
                 ints = predict_class(msg)
                 msg2 = f"JARVIS: {get_response(ints, intents, msg)}"
