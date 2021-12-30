@@ -211,11 +211,11 @@ def get_info(tag, request, previous=False):
     if tag == "time":
         ARGUMENTS[0] = "time"
         ARGUMENTS[1] = get_date()
-        return str(dt.datetime.now().time())[0:5]
+        return str(dt.datetime.now().time())[:5]
 
     if tag == "date":
         ARGUMENTS[0] = "date"
-        ARGUMENTS[1] = str(dt.datetime.now().time())[0:5]
+        ARGUMENTS[1] = str(dt.datetime.now().time())[:5]
         return get_date()
 
     if tag == "note":
