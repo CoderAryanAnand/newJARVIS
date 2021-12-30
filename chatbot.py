@@ -44,9 +44,9 @@ from chatbot_utils import (
 lemmatizer = WordNetLemmatizer()
 intents = json.loads(open("intents.json").read())
 
-words = pickle.load(open("models/words.pkl", "rb"))
-classes = pickle.load(open("models/classes.pkl", "rb"))
-types = pickle.load(open("models/types.pkl", "rb"))
+words = pickle.load(open("models/words.pkl", "rb"))  # nosec
+classes = pickle.load(open("models/classes.pkl", "rb"))  # nosec
+types = pickle.load(open("models/types.pkl", "rb"))  # nosec
 model = load_model("models/chatbotmodel.h5")
 
 ssl._create_default_https_context = (
