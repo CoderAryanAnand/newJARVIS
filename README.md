@@ -1,6 +1,7 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Creator: Aryan](https://img.shields.io/badge/creator-Aryan-darkblue)](https://github.com/CoderAryanAnand)
 [![License: MIT](https://img.shields.io/apm/l/vim-mode)](https://opensource.org/licenses/MIT)
+[![security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
 
 [![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)](https://python.org)
 [![PyCharm](https://img.shields.io/badge/pycharm-143?style=for-the-badge&logo=pycharm&logoColor=black&color=black&labelColor=green)](https://www.jetbrains.com/pycharm/)
