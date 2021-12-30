@@ -262,10 +262,12 @@ def make_window(theme, scale=None, win_size=(2560, 1440)):
     ]
 
     chat_layout = [
-        [sg.Text("Talk to Jarvis!")],
+
+        [sg.Text("Talk to Jarvis!", size=21)],
         [sg.HorizontalSeparator()],
-        [sg.Multiline("", k="-MULTILINE-", expand_x=True, expand_y=True, disabled=True)],
-        [sg.InputText(focus=True, key="-CHAT_INPUT-", enable_events=True), sg.Button("Enter", bind_return_key=True)]
+        [sg.Multiline("", k="-MULTILINE-", expand_x=True, expand_y=True,disabled=True)],
+        [sg.Multiline(focus=True, key="-CHAT_INPUT-", enable_events=True, expand_x=True, size=(0, 20)),
+         sg.Button("Enter", bind_return_key=True, size=(30, 20))]
 
     ]
 
@@ -543,17 +545,17 @@ def main():
 
         elif event == "Enter":
             msg = values["-CHAT_INPUT-"]
-            if not msg:
-                pass
-            else:
+
+            if msg:
                 window["-CHAT_INPUT-"].update("")
                 msg1 = f"You: {msg}"
                 textbox = window["-MULTILINE-"]
-                textbox.update(f"{textbox.get()}\n{msg1}")
+                textbox.update(f"{textbox.get()}{msg1}")
 
                 ints = predict_class(msg)
-                msg2 = f"JARVIS: {get_response(ints, intents)}"
-                textbox.update(f"{textbox.get()}\n{msg2}")
+                msg2 = f"JARVIS: {get_response(ints, intents, msg)}"
+                textbox.update(f"{textbox.get()}\n\n{msg2}\n\n")
+
 
     os.remove("email_body.html")
     window.close()

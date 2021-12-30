@@ -1,78 +1,68 @@
 import os.path
 import logging
-import random
 import json
 import pickle
+import re
+import random
 import webbrowser
-import imaplib
-import smtplib
-import email
-from email.parser import HeaderParser
-from email.utils import parseaddr
 
 import numpy as np
 import ssl
 
 # import curses
+import subprocess
 
-import requests
-import psutil
+
 import pyjokes as joke
-import wolframalpha as wolf
 import datetime as dt
-import pyautogui as pag
-import pywhatkit as kit
-import wikipedia as wiki
-from googlesearch import search
 
 import nltk
 from nltk.stem import WordNetLemmatizer
-from nltk.tokenize import sent_tokenize
-from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-from nltk.corpus import wordnet as wn
-from nltk.text import Text
-from scrapimdb import ImdbSpider
-from textblob import TextBlob
-from newspaper import Article
-import re
-from newsapi import NewsApiClient
-from PIL import Image
-from bs4 import BeautifulSoup
-
 from rich.console import Console
-from tqdm import tqdm, trange
 
 from tensorflow.keras.models import load_model
-from shlex import quote as shlex_quote
+
+from chatbot_utils import (
+    get_date,
+    image_to_ascii_art,
+    play_song,
+    review,
+    read_email,
+    note,
+    news,
+    cpu,
+    internet_search,
+    screenshot,
+    write_email,
+    search_wikipedia,
+    weather_and_temperature,
+    relaxing_music,
+    server,
+)
 
 lemmatizer = WordNetLemmatizer()
 intents = json.loads(open("intents.json").read())
 
-words = pickle.load(open("models/words.pkl", "rb"))
-classes = pickle.load(open("models/classes.pkl", "rb"))
-types = pickle.load(open("models/types.pkl", "rb"))
+words = pickle.load(open("models/words.pkl", "rb"))  # nosec
+classes = pickle.load(open("models/classes.pkl", "rb"))  # nosec
+types = pickle.load(open("models/types.pkl", "rb"))  # nosec
 model = load_model("models/chatbotmodel.h5")
 
-ssl._create_default_https_context = ssl._create_unverified_context  # potential security risk, but needed here
+ssl._create_default_https_context = (
+    ssl._create_unverified_context
+)  # potential security risk, but needed here
 
-API_KEY = "d4a8a95799bc4f3d9a34ac59cebaa456"
-DEFAULT_NEWS_SOURCE = "bbc-news"
-NEWS_API = NewsApiClient(API_KEY)
 ARGUMENTS = ["", ""]
-RELAXING_MUSIC = [
-    "https://www.youtube.com/watch?v=5qap5aO4i9A",
-    "https://www.youtube.com/watch?v=cGYyOY4XaFs",
-    "https://www.youtube.com/watch?v=M2NcuP5mRqs",
+NO_ANSWER_RESPONSES = [
+    "Sorry, can't understand you",
+    "Please give me more info",
+    "Not sure I understand",
 ]
-NO_ANSWER_RESPONSES = ["Sorry, can't understand you", "Please give me more info", "Not sure I understand"]
-APP_PASSWORD = "yrzvzurdmjrkiymn"
-EMAIL_USER = "aryananand.chess@gmail.com"
-IMAP_URL = "imap.gmail.com"
 
 console = Console()
 
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+# logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
 console.log(classes)
 console.log(types)
@@ -140,239 +130,47 @@ def remove_stopword(sentence):
     return [w for w in sentence if w not in stop_words]
 
 
-def get_date():
-    day = dt.date.today().day
-    month = dt.datetime.now().strftime("%B")
-    year = dt.datetime.today().year
-    weekday = dt.datetime.today().weekday()
-    if day in [1, 21, 31]:
-        return f"{weekday}, the {day}st of {month}, {year}."
-    elif day in [2, 22]:
-        return f"{weekday}, the {day}nd of {month}, {year}."
-    elif day in [3, 23]:
-        return f"{weekday}, the {day}rd of {month}, {year}."
-    else:
-        return f"{weekday}, the {day}th of {month}, {year}."
-
-
-def get_body(msg):
-    if msg.is_multipart():
-        return get_body(msg.get_payload(0))
-    else:
-        return msg.get_payload(None, True)
-
-
-def internet_search(request):
-    synonyms_for_internet = [
-        "internet",
-        "net",
-        "cyberspace",
-        "web",
-        "World_Wide_Web",
-        "WWW",
-        "google",
-    ]
-
-    request = request.replace("world wide web ", "")
-    request = request.replace(" world wide web", "")
-
-    cleaned_query = [remove_punctuation(request)]
-    speech_words_in_query = [word_tokenize(sentence) for sentence in cleaned_query]
-    filtered_query = [remove_stopword(s) for s in speech_words_in_query]
-    pos = [nltk.pos_tag(tokenized_sent) for tokenized_sent in filtered_query]
-
-    pos = pos[0]
-
-    new_pos = [
-        i
-        for i in pos
-        if i[0] != "search"
-           and all(word_here.lower() != i[0] for word_here in synonyms_for_internet)
-           and i[1] != "MD"
-           and i[0] != "please"
-           and i[0] != "get"
-    ]
-
-    query = "".join(i[0] + " " for i in new_pos)
-    search_results = [i for i in search(query)]
-
-    search_query = query.replace(" ", "+")
-
-    search_link = f"https://www.google.com/search?q={search_query}"
-
-    return_links = "\n".join(search_results)
-
-    return return_links, search_link
-
-
-def image_to_ascii_art(img_path, height_factor=0.4, new_width=80, output_file="", output_dec=False):
-    img = Image.open(img_path).convert("L")
-
-    width, height = img.size
-    aspect_ratio = height / width
-    new_width = new_width
-    new_height = aspect_ratio * new_width * height_factor
-    img = img.resize((new_width, int(new_height)))
-
-    pixels = img.getdata()
-
-    chars = ["*", "S", "#", "&", "@", "$", "%", "*", "!", ":", "."]
-    new_pixels = [chars[pixel // 25] for pixel in pixels]
-    new_pixels = "".join(new_pixels)
-
-    new_pixels_count = len(new_pixels)
-    ascii_image = [
-        new_pixels[index: index + new_width]
-        for index in range(0, new_pixels_count, new_width)
-    ]
-    ascii_image = "\n".join(ascii_image)
-    if output_dec:
-        with open(f"{output_file}.txt", "w") as f:
-            f.write(ascii_image)
-    return ascii_image
-
-
 def get_info(tag, request, previous=False):
-    # sourcery skip: extract-duplicate-method, extract-method, split-or-ifs
     if tag in ["weather", "temperature"]:
-        info = requests.get("https://ipinfo.io")
-        data = info.json()
-        city = data["city"]
-        region = data["region"]
-        country = data["country"]
-        app_id = "WE385L-EVQWJ72XK8"
-        client = wolf.Client(app_id)
-        result = client.query("weather forecast for" + city + ", " + country)
-        weather = next(result.results).text
-        w = weather.split("\n")
-
         ARGUMENTS[0] = ""
         ARGUMENTS[1] = ""
-
         if tag == "temperature":
-            return w[0]
-        else:
-            return w[1]
+            return weather_and_temperature(True)
+        return weather_and_temperature()
 
-    elif tag == "screenshot":
-        time_at_the_moment = dt.datetime.now()
-        file_name = (
-                ".\\screenshots\\"
-                + str(time_at_the_moment).replace(":", "-")
-                + "-screenshot.png"
-        )
-        img = pag.screenshot()
-        img.save(file_name)
+    if tag == "screenshot":
+        file_name = screenshot()
 
         ARGUMENTS[0] = "screenshot"
         ARGUMENTS[1] = f"{os.path.abspath(file_name)}"
 
         return
 
-    elif tag == "song":
-        cleaned_query = [remove_punctuation(request)]
-        speech_words_in_query = [word_tokenize(sentence) for sentence in cleaned_query]
-        filtered_query = [remove_stopword(s) for s in speech_words_in_query]
-        pos = [nltk.pos_tag(tokenized_sent) for tokenized_sent in filtered_query]
-
-        pos = pos[0]
-
-        new_pos = [
-            i
-            for i in pos
-            if i[0] != "music"
-               and i[0] != "play"
-               and i[0] != "song"
-               and i[1] != "MD"
-               and i[0] != "please"
-        ]
-
-        song_name = "".join(i[0] for i in new_pos)
-        song_name = song_name if song_name != "" else random.choice(RELAXING_MUSIC)
-        kit.playonyt(song_name)
+    if tag == "song":
+        play_song(request)
 
         ARGUMENTS[0] = ""
         ARGUMENTS[1] = ""
 
         return
 
-    elif tag == "relaxing_music":
-        kit.playonyt(random.choice(RELAXING_MUSIC))
+    if tag == "relaxing_music":
+        relaxing_music()
 
         ARGUMENTS[0] = ""
         ARGUMENTS[1] = ""
 
         return
 
-    elif tag == "wikipedia":
-        try:
-            # query = input("What do you what to search on wikipedia?\n")
+    if tag == "wikipedia":
+        results, url, search_link = search_wikipedia(request)
 
-            cleaned_query = [remove_punctuation(request)]
-            speech_words_in_query = [
-                word_tokenize(sentence) for sentence in cleaned_query
-            ]
-            filtered_query = [remove_stopword(s) for s in speech_words_in_query]
-            pos = [nltk.pos_tag(tokenized_sent) for tokenized_sent in filtered_query]
+        ARGUMENTS[0] = "wikipedia"
+        ARGUMENTS[1] = search_link
 
-            pos = pos[0]
+        return results, url
 
-            new_pos = [
-                i
-                for i in pos
-                if i[0] != "wiki"
-                   and i[0] != "search"
-                   and i[0] != "wikipedia"
-                   and i[1] != "MD"
-                   and i[0] != "please"
-                   and i[0] != "get"
-            ]
-
-            query = "".join(i[0] for i in new_pos)
-            query = query.replace(" ", "")
-            results = wiki.summary(query, sentences=2)
-            result_page = wiki.page(query)
-            return results, result_page.url
-        except wiki.exceptions.PageError:
-            return ""
-        finally:
-
-            # --------------------------------
-            # SEPARATION FROM WIKIPEDIA TO SEARCH
-            # --------------------------------
-
-            cleaned_query = [remove_punctuation(request)]
-            speech_words_in_query = [
-                word_tokenize(sentence) for sentence in cleaned_query
-            ]
-            filtered_query = [remove_stopword(s) for s in speech_words_in_query]
-            pos = [nltk.pos_tag(tokenized_sent) for tokenized_sent in filtered_query]
-
-            pos = pos[0]
-
-            new_pos = [
-                i
-                for i in pos
-                if i[0] != "wiki"
-                   and i[0] != "search"
-                   and i[0] != "wikipedia"
-                   and i[1] != "MD"
-                   and i[0] != "please"
-                   and i[0] != "get"
-            ]
-
-            query = "".join(i[0] + " " for i in new_pos)
-
-            query = "".join(i[0] for i in new_pos)
-
-            search_query = query.replace(" ", "+")
-
-            search_link = f"https://www.google.com/search?q={search_query}"
-
-            ARGUMENTS[0] = "wikipedia"
-            ARGUMENTS[1] = search_link
-
-    elif tag == "internet_search":
+    if tag == "internet_search":
         return_links, search_link = internet_search(request)
 
         ARGUMENTS[0] = "internet_search"
@@ -380,195 +178,101 @@ def get_info(tag, request, previous=False):
 
         return return_links, search_link
 
-    elif tag == "review":
-        synonyms_for_internet_and_review = [
-            "internet",
-            "net",
-            "cyberspace",
-            "web",
-            "World_Wide_Web",
-            "WWW",
-            "google",
-            "review",
-            "imdb",
-        ]
+    if tag == "review":
 
-        request = request.replace("world wide web ", "")
-        request = request.replace(" world wide web", "")
-
-        cleaned_query = [remove_punctuation(request)]
-        speech_words_in_query = [word_tokenize(sentence) for sentence in cleaned_query]
-        filtered_query = [remove_stopword(s) for s in speech_words_in_query]
-        pos = [nltk.pos_tag(tokenized_sent) for tokenized_sent in filtered_query]
-
-        pos = pos[0]
-
-        new_pos = [
-            i
-            for i in pos
-            if i[0] != "search"
-               and all(
-                word_here.lower() != i[0]
-                for word_here in synonyms_for_internet_and_review
-            )
-               and i[1] != "MD"
-               and i[0] != "please"
-               and i[0] != "get"
-        ]
-
-        query = "".join(i[0] + " " for i in new_pos)
-        imdb_review = ImdbSpider(query)
-
-        # --------------------------------
-        # SEPARATION FROM REVIEW TO SEARCH
-        # --------------------------------
-
-        query = "".join(i[0] for i in new_pos)
-
-        search_query = query.replace(" ", "+")
-
-        search_link = f"https://www.google.com/search?q={search_query}"
+        rating, link, search_link = review(request)
 
         ARGUMENTS[0] = "review"
         ARGUMENTS[1] = search_link
 
-        return imdb_review.get_rating(), imdb_review.get_link()
+        return rating, link
 
-    elif tag == "news":
-        article = NEWS_API.get_top_headlines(sources=DEFAULT_NEWS_SOURCE)
-
-        url = article[0]["url"]
-        article = Article(url)
-
-        article.download()
-        article.parse()
-
-        article.nlp()
-        analysis = TextBlob(article.text)
+    if tag == "news":
+        analysis, url = news()
 
         ARGUMENTS[0] = "news"
         ARGUMENTS[1] = url
 
         return analysis, url
 
-    elif tag == "cpu":
-        usage = str(psutil.cpu_percent())
-        battery = str(psutil.sensors_battery().percent)
-        plugged_in = psutil.sensors_battery().power_plugged
-        plugged_in = "is" if plugged_in else "is not"
+    if tag == "cpu":
+        usage, battery, plugged_in = cpu()
 
         ARGUMENTS[0] = ""
         ARGUMENTS[1] = ""
 
         return usage, battery, plugged_in
 
-    elif tag == "joke":
+    if tag == "joke":
         ARGUMENTS[0] = "joke"
         ARGUMENTS[1] = joke.get_joke()
         return joke.get_joke()
 
-    elif tag == "time":
+    if tag == "time":
         ARGUMENTS[0] = "time"
         ARGUMENTS[1] = get_date()
-        return str(dt.datetime.now().time())[0:5]
+        return str(dt.datetime.now().time())[:5]
 
-    elif tag == "date":
+    if tag == "date":
         ARGUMENTS[0] = "date"
-        ARGUMENTS[1] = str(dt.datetime.now().time())[0:5]
+        ARGUMENTS[1] = str(dt.datetime.now().time())[:5]
         return get_date()
 
-    elif tag == "note":
-        date = str(dt.datetime.now()).replace(":", "-")[:-7]
-        file_name = f"notes/{date}-note.txt"
-
-        text = input("What do you want to write to your file?")
-
-        with open(file_name, "w") as f:
-            f.write(text)
+    if tag == "note":
+        file_name = note()
 
         ARGUMENTS[0] = "note"
-        ARGUMENTS[1] = f"notepad.exe {os.path.abspath(file_name)}"
+        ARGUMENTS[1] = f"notepad.exe {file_name}"
+        return file_name
 
-        return os.path.abspath(file_name)
-
-    elif tag == "read_email":
-        con = imaplib.IMAP4_SSL(IMAP_URL)
-        con.login(EMAIL_USER, APP_PASSWORD)
-
-        con.select("Primary")
-
-        num = con.select("Primary")
-        result, data = con.fetch(num[1][0], "(RFC822)")
-        raw = email.message_from_bytes(data[0][1])
-
-        sender = parseaddr(HeaderParser().parsestr(data[0][1].decode("utf-8"))["From"])[
-            1
-        ]
+    if tag == "read_email":
+        body, sender, sender1 = read_email()
 
         ARGUMENTS[0] = "read_email"
-        ARGUMENTS[1] = sender[1]
+        ARGUMENTS[1] = sender1
 
-        return get_body(raw).decode("utf-8"), sender[0]
+        return body, sender
 
-    elif tag == "write_email":
-        server = smtplib.SMTP("smtp.gmail.com", 587)
-        server.ehlo()
-        server.starttls()
-        server.ehlo()
-        server.login(EMAIL_USER, APP_PASSWORD)
-
-        receiver = input("Receiver: ")
-        subject = input("Subject: ")
-        body = input("Content: ")
-
-        msg = f"Subject: {subject}\n\n{body}"
-
-        server.sendmail("JARVIS", receiver, msg)
+    if tag == "write_email":
+        write_email()
 
         ARGUMENTS[0] = ""
         ARGUMENTS[1] = ""
 
         return
 
-    elif previous:
-        if ARGUMENTS[0] != "" and ARGUMENTS[1] != "":
-            if ARGUMENTS[0] in ["note", "screenshot"]:
-                os.system(ARGUMENTS[1])
-                ARGUMENTS[0] = ""
-                ARGUMENTS[1] = ""
+    if previous and ARGUMENTS[0] != "" and ARGUMENTS[1] != "":
+        if ARGUMENTS[0] in ["note", "screenshot"]:
+            subprocess.call(ARGUMENTS[1], shell=False)
+            ARGUMENTS[0] = ""
+            ARGUMENTS[1] = ""
 
-            elif ARGUMENTS[0] in ["internet_search", "review", "wikipedia", "news"]:
-                webbrowser.open(ARGUMENTS[1])
-                ARGUMENTS[0] = ""
-                ARGUMENTS[1] = ""
+        elif ARGUMENTS[0] in ["internet_search", "review", "wikipedia", "news"]:
+            webbrowser.open(ARGUMENTS[1])
+            ARGUMENTS[0] = ""
+            ARGUMENTS[1] = ""
 
-            elif ARGUMENTS[0] in ["time", "date"]:
-                console.print(ARGUMENTS[1])
-                ARGUMENTS[0] = ""
-                ARGUMENTS[1] = ""
+        elif ARGUMENTS[0] in ["time", "date"]:
+            console.print(ARGUMENTS[1])
+            ARGUMENTS[0] = ""
+            ARGUMENTS[1] = ""
 
-            elif ARGUMENTS[0] == "joke":
-                console.print(f"{ARGUMENTS[1]}\nDo you want to hear another one?")
-                ARGUMENTS[0] = "joke"
-                ARGUMENTS[1] = joke.get_joke()
+        elif ARGUMENTS[0] == "joke":
+            console.print(f"{ARGUMENTS[1]}\nDo you want to hear another one?")
+            ARGUMENTS[0] = "joke"
+            ARGUMENTS[1] = joke.get_joke()
 
-            elif ARGUMENTS[0] == "read_email":
-                server = smtplib.SMTP("smtp.gmail.com", 587)
-                server.ehlo()
-                server.starttls()
-                server.ehlo()
-                server.login(EMAIL_USER, APP_PASSWORD)
+        elif ARGUMENTS[0] == "read_email":
+            receiver = ARGUMENTS[1]
+            subject = input("Subject: ")
+            body = input("Content: ")
 
-                receiver = ARGUMENTS[1]
-                subject = input("Subject: ")
-                body = input("Content: ")
+            msg = f"Subject: {subject}\n\n{body}"
 
-                msg = f"Subject: {subject}\n\n{body}"
+            server.sendmail("JARVIS", receiver, msg)
 
-                server.sendmail("JARVIS", receiver, msg)
-
-                ARGUMENTS[0] = ""
-                ARGUMENTS[1] = ""
+            ARGUMENTS[0] = ""
+            ARGUMENTS[1] = ""
 
 
 def clean_up_sentence(sentence):
@@ -594,7 +298,6 @@ def predict_class(sentence):
     results = [[i, r] for i, r in enumerate(result_of_model) if r > error_threshold]
     results.sort(key=lambda x: x[1], reverse=True)
     sentence = sentence.replace(" ", "")
-    console.log(results)
     if sentence != "":
         return [
             {
@@ -604,15 +307,16 @@ def predict_class(sentence):
             }
             for r in results
         ]
-    else:
-        return [{
-                "intent": "no_answer",
-                "probability": "0.9629686",
-                "type_of_intent": "n",
-            }]
+    return [
+        {
+            "intent": "no_answer",
+            "probability": "0.9629686",
+            "type_of_intent": "n",
+        }
+    ]
 
 
-def get_response(intents_list, intents_json):
+def get_response(intents_list, intents_json, msg):
     try:
         tag = intents_list[0]["intent"]
         type_of_intent = intents_list[0]["type_of_intent"]
@@ -624,11 +328,11 @@ def get_response(intents_list, intents_json):
                     ARGUMENTS[0] = ""
                     ARGUMENTS[1] = ""
                 elif tag != "continue_dialog":
-                    info = get_info(tag, message)
+                    info = get_info(tag, msg)
                     # print(info)
                     result = random.choice(i["responses"]).format(info)
                 elif ARGUMENTS[0] != "" and ARGUMENTS[1] != "":
-                    get_info(tag, message, previous=True)
+                    get_info(tag, msg, previous=True)
                     result = ""
                 else:
                     result = "Ok..."
@@ -705,12 +409,13 @@ speech_words2.concordance("great")
 #   for synonym in unique:
 #     print('\t', synonym)
 
-print("\n" * 150, image_to_ascii_art("index.jpg", 0.37, 80))
-console.print("\n", image_to_ascii_art("index.png", 0.37, 40))
+if __name__ == "__main__":
+    print("\n" * 150, image_to_ascii_art("index.jpg", 0.37, 80))
+    console.print("\n", image_to_ascii_art("index.png", 0.37, 40))
 
-while True:
-    message = input("> ")
+    while True:
+        message = input("> ")
 
-    ints = predict_class(message)
-    res = get_response(ints, intents)
-    console.print(res)
+        ints = predict_class(message)
+        res = get_response(ints, intents, message)
+        console.print(res)
