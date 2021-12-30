@@ -262,6 +262,7 @@ def make_window(theme, scale=None, win_size=(2560, 1440)):
     ]
 
     chat_layout = [
+
         [sg.Text("Talk to Jarvis!", size=21)],
         [sg.HorizontalSeparator()],
         [sg.Multiline("", k="-MULTILINE-", expand_x=True, expand_y=True,disabled=True)],
@@ -544,6 +545,7 @@ def main():
 
         elif event == "Enter":
             msg = values["-CHAT_INPUT-"]
+
             if msg:
                 window["-CHAT_INPUT-"].update("")
                 msg1 = f"You: {msg}"
@@ -553,6 +555,7 @@ def main():
                 ints = predict_class(msg)
                 msg2 = f"JARVIS: {get_response(ints, intents, msg)}"
                 textbox.update(f"{textbox.get()}\n\n{msg2}\n\n")
+
 
     os.remove("email_body.html")
     window.close()
