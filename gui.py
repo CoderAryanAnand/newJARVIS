@@ -32,7 +32,7 @@ NEWS_API = NewsApiClient(API_KEY)
 
 
 def get_weather(
-        temp_now=False, feel=False, status=False, wind=False, humidity=False, rain=False
+    temp_now=False, feel=False, status=False, wind=False, humidity=False, rain=False
 ):
     observation = mgr.weather_at_place(LOCATION)
     w = observation.weather
@@ -159,12 +159,27 @@ def make_window(theme, scale=None, win_size=(2560, 1440)):
         )
     ]
 
-    news_urls = [article["url"] for article in NEWS_API.get_top_headlines()["articles"][:20]]
-    news_headlines = [article["title"] for article in NEWS_API.get_top_headlines()["articles"][:20]]
-    news_authors = [article["author"] for article in NEWS_API.get_top_headlines()["articles"][:20]]
-    news_description = [article["description"] for article in NEWS_API.get_top_headlines()["articles"][:20]]
-    news_source = [article["source"]["name"] for article in NEWS_API.get_top_headlines()["articles"][:20]]
-    news_date = [article["publishedAt"] for article in NEWS_API.get_top_headlines()["articles"][:20]]
+    news_urls = [
+        article["url"] for article in NEWS_API.get_top_headlines()["articles"][:20]
+    ]
+    news_headlines = [
+        article["title"] for article in NEWS_API.get_top_headlines()["articles"][:20]
+    ]
+    news_authors = [
+        article["author"] for article in NEWS_API.get_top_headlines()["articles"][:20]
+    ]
+    news_description = [
+        article["description"]
+        for article in NEWS_API.get_top_headlines()["articles"][:20]
+    ]
+    news_source = [
+        article["source"]["name"]
+        for article in NEWS_API.get_top_headlines()["articles"][:20]
+    ]
+    news_date = [
+        article["publishedAt"]
+        for article in NEWS_API.get_top_headlines()["articles"][:20]
+    ]
 
     news_data = [
         [headline, author, source, date, desc]
@@ -199,10 +214,14 @@ def make_window(theme, scale=None, win_size=(2560, 1440)):
     github_repo_frame = [github_repo_table]
     news_frame = [news_table]
 
-    todo_frame = [[sg.InputText('Enter ToDo Item', key='todo_item'),
-                   sg.Button(button_text='Add', key="add_save")],
-                  [sg.Listbox(values=tasks, size=(40, 10), key="items")],
-                  [sg.Button('Delete Task'), sg.Button('Edit')]]
+    todo_frame = [
+        [
+            sg.InputText("Enter ToDo Item", key="todo_item"),
+            sg.Button(button_text="Add", key="add_save"),
+        ],
+        [sg.Listbox(values=tasks, size=(40, 10), key="items")],
+        [sg.Button("Delete Task"), sg.Button("Edit")],
+    ]
 
     general_layout = [
         [sg.Menu(menu_def, key="-MENU-")],
@@ -224,51 +243,51 @@ def make_window(theme, scale=None, win_size=(2560, 1440)):
                 expand_x=True,
             ),
         ],
-
         [sg.HorizontalSeparator()],
-
-        [sg.Frame(
-                    "Github Repositories",
-                    github_repo_frame,
-                    title_color="purple",
-                    font="Any 16",
-                    expand_x=True,
-                    )
+        [
+            sg.Frame(
+                "Github Repositories",
+                github_repo_frame,
+                title_color="purple",
+                font="Any 16",
+                expand_x=True,
+            )
         ],
-
         [sg.Button("Open"), sg.Button("Delete")],
-
         [sg.HorizontalSeparator()],
-
-        [sg.Frame("To Do",
-                  todo_frame,
-                  title_color="pink",
-                  font="Any 16",
-                  expand_x=True
-                  )
-         ],
-
+        [
+            sg.Frame(
+                "To Do", todo_frame, title_color="pink", font="Any 16", expand_x=True
+            )
+        ],
         [sg.HorizontalSeparator()],
-
-        [sg.Frame("News",
-                  news_frame,
-                  title_color="green",
-                  font="Any 16",
-                  expand_x=True)],
-
+        [
+            sg.Frame(
+                "News", news_frame, title_color="green", font="Any 16", expand_x=True
+            )
+        ],
         [sg.HorizontalSeparator()],
-
         [sg.Button("Update", key="UPDATEB")],
     ]
 
     chat_layout = [
-
         [sg.Text("Talk to Jarvis!", size=21)],
         [sg.HorizontalSeparator()],
-        [sg.Multiline("", k="-MULTILINE-", expand_x=True, expand_y=True,disabled=True)],
-        [sg.Input(focus=True, key="-CHAT_INPUT-", enable_events=True, expand_x=True, size=(0, 20)),
-         sg.Button("Enter", bind_return_key=True, size=(30, 20))]
-
+        [
+            sg.Multiline(
+                "", k="-MULTILINE-", expand_x=True, expand_y=True, disabled=True
+            )
+        ],
+        [
+            sg.Input(
+                focus=True,
+                key="-CHAT_INPUT-",
+                enable_events=True,
+                expand_x=True,
+                size=(0, 20),
+            ),
+            sg.Button("Enter", bind_return_key=True, size=(30, 20)),
+        ],
     ]
 
     logging_layout = [
@@ -360,9 +379,7 @@ def make_window(theme, scale=None, win_size=(2560, 1440)):
                         sg.Tab(
                             "General", layout_column, element_justification="center"
                         ),
-                        sg.Tab(
-                            "Chat", chat_layout, element_justification="center"
-                        ),
+                        sg.Tab("Chat", chat_layout, element_justification="center"),
                     ]
                 ],
                 key="-TAB GROUP-",
@@ -514,7 +531,9 @@ def main():
                     message_index = idx
                     break
 
-            answer = sg.popup_yes_no(f'Are you sure you want to delete {repo_names[message_index]}?')
+            answer = sg.popup_yes_no(
+                f"Are you sure you want to delete {repo_names[message_index]}?"
+            )
             if answer == "Yes":
                 for repo in g.get_user().get_repos():
                     if repo.id == repo_ids[message_index]:
@@ -527,21 +546,21 @@ def main():
                 sg.popup_auto_close(f"Not deleting {repo_names[message_index]}")
 
         elif event == "add_save":
-            tasks.append(values['todo_item'])
-            window['items'].update(values=tasks)
-            window['add_save'].update("Add")
+            tasks.append(values["todo_item"])
+            window["items"].update(values=tasks)
+            window["add_save"].update("Add")
         elif event == "Delete Task":
             tasks.remove(values["items"][0])
-            window['items'].update(values=tasks)
+            window["items"].update(values=tasks)
         elif event == "Edit":
             edit_val = values["items"][0]
             try:
                 tasks.remove(values["items"][0])
             except IndexError:
                 print(IndexError)
-            window['items'].update(values=tasks)
-            window['todo_item'].update(value=edit_val)
-            window['add_save'].update("Save")
+            window["items"].update(values=tasks)
+            window["todo_item"].update(value=edit_val)
+            window["add_save"].update("Save")
 
         elif event == "Enter":
             msg = values["-CHAT_INPUT-"]
@@ -555,7 +574,6 @@ def main():
                 ints = predict_class(msg)
                 msg2 = f"JARVIS: {get_response(ints, intents, msg)}"
                 textbox.update(f"{textbox.get()}\n\n{msg2}\n\n")
-
 
     os.remove("email_body.html")
     window.close()
