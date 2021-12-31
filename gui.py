@@ -1,4 +1,5 @@
 import os
+import json
 import webbrowser
 
 import PySimpleGUI as sg
@@ -11,22 +12,24 @@ from newsapi import NewsApiClient
 
 from chatbot import get_response, predict_class, intents
 
-NAME = "Aryan"
-LOCATION = "Wettingen"
+credentials = json.load(open("credentials.json"))
+
+NAME = credentials.get("name")
+LOCATION = credentials.get("location")
 
 sg.theme("Dark")
 
-owm = OWM("4c91a9d1955812834b13222e91aac521")
+owm = OWM(credentials.get("owm"))
 mgr = owm.weather_manager()
 
 gmail = Gmail()
 
-g = Github("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")
+g = Github(credentials.get("github"))
 
 github_repo_data, repo_names, repo_ids, repo_urls = [[]], "", [0], ""
 news_data, news_headlines, news_urls = [[]], "", ""
 
-API_KEY = "d4a8a95799bc4f3d9a34ac59cebaa456"
+API_KEY = credentials.get("news")
 # DEFAULT_NEWS_SOURCE = "bbc-news"
 NEWS_API = NewsApiClient(API_KEY)
 

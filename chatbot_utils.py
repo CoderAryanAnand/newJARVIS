@@ -25,6 +25,7 @@ import imaplib
 import smtplib
 import email
 import psutil
+import json
 import ssl
 import re
 
@@ -32,7 +33,9 @@ ssl._create_default_https_context = (
     ssl._create_unverified_context
 )  # potential security risk, but needed here
 
-API_KEY = "d4a8a95799bc4f3d9a34ac59cebaa456"
+credentials = json.load(open("credentials.json"))
+
+API_KEY = credentials.get("news")
 DEFAULT_NEWS_SOURCE = "bbc-news"
 NEWS_API = NewsApiClient(API_KEY)
 ARGUMENTS = ["", ""]
@@ -46,8 +49,8 @@ NO_ANSWER_RESPONSES = [
     "Please give me more info",
     "Not sure I understand",
 ]
-APP_PASSWORD = "yrzvzurdmjrkiymn"
-EMAIL_USER = "aryananand.chess@gmail.com"
+APP_PASSWORD = credentials.get("gmail")[0]
+EMAIL_USER = credentials.get("gmail")[1]
 IMAP_URL = "imap.gmail.com"
 
 server = smtplib.SMTP("smtp.gmail.com", 587)
