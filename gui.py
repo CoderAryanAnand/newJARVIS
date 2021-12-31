@@ -21,7 +21,7 @@ mgr = owm.weather_manager()
 
 gmail = Gmail()
 
-g = Github("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")
+g = Github("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")
 
 github_repo_data, repo_names, repo_ids, repo_urls = [[]], "", [0], ""
 news_data, news_headlines, news_urls = [[]], "", ""
@@ -275,7 +275,7 @@ def make_window(theme, scale=None, win_size=(2560, 1440)):
         [sg.HorizontalSeparator()],
         [
             sg.Multiline(
-                "", k="-MULTILINE-", expand_x=True, expand_y=True, disabled=True
+                "", k="-MULTILINE-", expand_x=True, expand_y=True, disabled=True, enable_events=True
             )
         ],
         [
