@@ -16,6 +16,16 @@ however, will be used to train a model. Check ``training.py`` to see how it trai
 ## Usage
 
 If models folder is empty, then run ``training.py`` first, and then run ``chatbot.py``.
+After installing ``nltk``, run this in the console.
+```python
+import nltk
+
+nltk.download("punkt")
+nltk.download("stopwords")
+nltk.download("wordnet")
+nltk.download("averaged_perceptron_tagger")
+```
+Then install the other libraries from ``requirements.txt`` and everything should work.
 
 ## Example
 
